@@ -16,8 +16,25 @@
     "service2": "General Construction & Contracting",
     "service3": "MEP Services (Mechanical, Electrical, Plumbing)",
     "service4": "Renovation & Retrofitting",
+    "portfolioCta": "Explore Our Portfolio",
     "toggleLabel": "Switch language",
     "switchTo": "العربية",
     "directionIcon": "Directional indicator"
+  },
+  "portfolio": {
+    "title": "Selected Project Portfolio",
+    "description": "Sample projects seeded for Phase 1 preview and data-flow verification.",
+    "backToHome": "Back to Home",
+    "statusLabel": "Status",
+    "sectorLabel": "Sector",
+    "statusValues": {
+      "ongoing": "Ongoing",
+      "completed": "Completed"
+    },
+    "sectorValues": {
+      "commercial": "Commercial",
+      "residential": "Residential",
+      "infrastructure": "Infrastructure"
+    }
   }
 }

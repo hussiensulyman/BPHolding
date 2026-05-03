@@ -2,6 +2,7 @@
 
 ## Phase 1: MVP Foundation (Current)
 
+- [x] Step 1: Repository initialization and scaffold completed.
 - Next.js 16 + TypeScript + Tailwind baseline.
 - Arabic-first i18n and RTL/LTR rendering.
 - PostgreSQL schema bootstrap with Prisma.

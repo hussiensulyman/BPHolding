@@ -11,7 +11,13 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov", "html"],
-      include: ["src/lib/utils/**/*.{ts,tsx}"],
+      include: [
+        "src/lib/utils/**/*.{ts,tsx}",
+        "src/lib/auth/**/*.{ts,tsx}",
+        "src/lib/data/**/*.{ts,tsx}",
+        "src/lib/security/**/*.{ts,tsx}",
+        "src/lib/validation/**/*.{ts,tsx}",
+      ],
       thresholds: {
         lines: 80,
         functions: 80,

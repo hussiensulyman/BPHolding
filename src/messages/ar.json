@@ -16,8 +16,25 @@
     "service2": "الإنشاءات والمقاولات العامة",
     "service3": "خدمات الأنظمة الكهروميكانيكية",
     "service4": "التجديد وإعادة التأهيل",
+    "portfolioCta": "استعرض أعمالنا",
     "toggleLabel": "تبديل اللغة",
     "switchTo": "English",
     "directionIcon": "مؤشر الاتجاه"
+  },
+  "portfolio": {
+    "title": "نماذج من مشاريعنا",
+    "description": "مشاريع تجريبية من بيانات Seed لعرض المرحلة الأولى والتحقق من تدفق البيانات.",
+    "backToHome": "العودة للرئيسية",
+    "statusLabel": "الحالة",
+    "sectorLabel": "القطاع",
+    "statusValues": {
+      "ongoing": "قيد التنفيذ",
+      "completed": "مكتمل"
+    },
+    "sectorValues": {
+      "commercial": "تجاري",
+      "residential": "سكني",
+      "infrastructure": "بنية تحتية"
+    }
   }
 }

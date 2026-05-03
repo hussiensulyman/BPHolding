@@ -1,9 +1,16 @@
 import { getTranslations } from "next-intl/server";
 
 import { LanguageToggle } from "@/components/layout/language-toggle";
+import type { AppLocale } from "@/lib/config/app-config";
 
-export default async function HomePage() {
-  const t = await getTranslations("home");
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const activeLocale = locale as AppLocale;
+  const t = await getTranslations({ locale: activeLocale, namespace: "home" });
 
   return (
     <main className="inline-pad mx-inline-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 py-10">
@@ -52,6 +59,14 @@ export default async function HomePage() {
             {t("service4")}
           </li>
         </ul>
+        <div className="mt-6">
+          <a
+            href={`/${activeLocale}/portfolio`}
+            className="inline-flex items-center rounded-full bg-primary px-5 py-2 font-semibold text-white transition hover:bg-primary/90"
+          >
+            {t("portfolioCta")}
+          </a>
+        </div>
       </section>
     </main>
   );

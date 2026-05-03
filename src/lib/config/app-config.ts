@@ -8,6 +8,7 @@ export const APP_CONFIG = {
   },
   testIds: {
     languageToggle: "language-toggle",
+    portfolioProjectItem: "portfolio-project-item",
   },
 } as const;
 
