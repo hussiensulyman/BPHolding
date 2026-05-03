@@ -45,5 +45,121 @@
       "residential": "Residential",
       "infrastructure": "Infrastructure"
     }
+  },
+  "forms": {
+    "rfq": {
+      "title": "Request for Quotation",
+      "subtitle": "Share your project details and BP Holding will contact you with a tailored proposal.",
+      "prefilledCategory": "Project category was prefilled from the selected portfolio project.",
+      "progressLabel": "Progress",
+      "steps": {
+        "project": "Project Details",
+        "contact": "Contact Information",
+        "files": "Files and Review"
+      },
+      "projectType": {
+        "label": "Project Type",
+        "error": "Please select a valid project type.",
+        "options": {
+          "Residential": "Residential",
+          "Commercial": "Commercial",
+          "Renovation": "Renovation",
+          "MEP": "MEP",
+          "Engineering": "Engineering"
+        }
+      },
+      "location": {
+        "label": "Project Location",
+        "error": "Location must be at least 2 characters."
+      },
+      "city": {
+        "label": "City",
+        "error": "Please select Riyadh or Jeddah.",
+        "options": {
+          "Riyadh": "Riyadh",
+          "Jeddah": "Jeddah"
+        }
+      },
+      "budgetRange": {
+        "label": "Budget Range",
+        "error": "Please select a valid budget range.",
+        "options": {
+          "lt500k": "<500k SAR",
+          "from500kTo2m": "500k-2M SAR",
+          "from2mTo5m": "2M-5M SAR",
+          "above5m": "5M+ SAR"
+        }
+      },
+      "timeline": {
+        "label": "Timeline",
+        "error": "Please select a valid timeline.",
+        "options": {
+          "urgent": "Urgent <1mo",
+          "oneToThree": "1-3mo",
+          "threeToSix": "3-6mo",
+          "sixPlus": "6mo+"
+        }
+      },
+      "description": {
+        "label": "Project Description",
+        "placeholderEn": "Describe your project scope, priorities, and expected deliverables.",
+        "placeholderAr": "اشرح نطاق المشروع والأولويات والمخرجات المتوقعة.",
+        "error": "Please provide a project description up to 2000 characters."
+      },
+      "contact": {
+        "name": {
+          "label": "Contact Name",
+          "error": "Name must be at least 2 characters."
+        },
+        "email": {
+          "label": "Email",
+          "error": "Please enter a valid email address."
+        },
+        "phone": {
+          "label": "Phone (+966)",
+          "error": "Phone must be a valid Saudi number in +966 format."
+        },
+        "company": {
+          "label": "Company (Optional)",
+          "error": "Company name format is invalid."
+        }
+      },
+      "files": {
+        "label": "Drop files here or click to upload",
+        "helper": "Accepted: PDF, PNG, JPG, DWG. Max 10 files, each up to 10MB.",
+        "summaryLabel": "Uploaded Files",
+        "error": "Please upload valid ImageKit files (PDF, image, DWG) within limits.",
+        "uploadError": "Upload failed. Please retry.",
+        "retry": "Retry",
+        "remove": "Remove"
+      },
+      "review": {
+        "title": "Review Summary"
+      },
+      "draft": {
+        "restored": "Draft restored from your browser."
+      },
+      "navigation": {
+        "back": "Back",
+        "next": "Next",
+        "submit": "Submit RFQ",
+        "submitting": "Submitting..."
+      }
+    },
+    "rfqSuccess": {
+      "title": "RFQ Submitted Successfully",
+      "subtitle": "Thank you for contacting BP Holding. Our team will review your request shortly.",
+      "referenceLabel": "Reference Number",
+      "downloadProfile": "Download Company Profile PDF",
+      "browseSimilar": "Browse Similar Projects",
+      "openAdminMock": "Open Admin Dashboard (Mock)",
+      "adminSyncMock": "Admin dashboard sync is queued (mock).",
+      "redirectIn": "Redirecting to homepage in {seconds}s",
+      "adminDashboardMockTitle": "RFQ Admin Dashboard (Mock)",
+      "adminDashboardMockSubtitle": "This mocked dashboard row simulates how submissions appear for internal teams.",
+      "adminStatus": "Status",
+      "adminStatusValue": "Queued",
+      "backToRfq": "Back to RFQ"
+    }
   }
 }

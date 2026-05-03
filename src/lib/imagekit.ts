@@ -1,5 +1,15 @@
 import { buildSrc, upload } from "@imagekit/next";
 import type { Transformation } from "@imagekit/next";
+import ImageKit from "imagekit";
+
+import {
+  RFQ_ALLOWED_EXTENSIONS,
+  RFQ_ALLOWED_MIME_TYPES,
+  RFQ_MAX_FILE_SIZE_BYTES,
+  type RfqFileType,
+  type RfqProjectType,
+  inferFileType,
+} from "@/validations/rfq";
 
 function resolveImageKitPublicUrl(): string {
   const candidates = [
@@ -31,6 +41,43 @@ const IMAGEKIT_PRIVATE_KEY =
   process.env.IMAGEKIT_URL_PRIVATE ?? process.env.IMAGEKIT_PRIVATE_KEY;
 
 const IMAGEKIT_PUBLIC_KEY = process.env.IMAGEKIT_PUBLIC_KEY;
+
+type ImageKitAuthParameters = {
+  token: string;
+  expire: number;
+  signature: string;
+};
+
+export type RfqUploadSignatureInput = {
+  fileName: string;
+  mimeType: string;
+  size: number;
+  projectType: RfqProjectType;
+};
+
+export type RfqUploadSignatureResult =
+  | {
+      mode: "imagekit";
+      uploadUrl: string;
+      publicKey: string;
+      folder: string;
+      fileName: string;
+      token: string;
+      expire: number;
+      signature: string;
+    }
+  | {
+      mode: "mock";
+      mockPublicUrlBase: string;
+      fileName: string;
+    };
+
+export type RfqUploadedFileVerificationInput = {
+  fileId?: string;
+  url: string;
+  type: RfqFileType;
+  mimeType: string;
+};
 
 export type ImageKitResponsiveOptions = {
   width?: number;
@@ -64,6 +111,122 @@ function getUploadCredentials(): { privateKey: string; publicKey: string } {
 
 function sanitizeFileName(fileName: string): string {
   return fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
+}
+
+function getFileExtension(fileName: string): string {
+  const lastDotIndex = fileName.lastIndexOf(".");
+
+  if (lastDotIndex < 0) {
+    return "";
+  }
+
+  return fileName.slice(lastDotIndex).toLowerCase();
+}
+
+function normalizeMimeType(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function isAllowedRfqMimeType(mimeType: string, type: RfqFileType): boolean {
+  const normalizedMimeType = normalizeMimeType(mimeType);
+  const allowedMimeTypes = RFQ_ALLOWED_MIME_TYPES[type] as readonly string[];
+
+  return allowedMimeTypes.includes(normalizedMimeType);
+}
+
+function createImageKitClient(): ImageKit | null {
+  if (!IMAGEKIT_PRIVATE_KEY || !IMAGEKIT_PUBLIC_KEY) {
+    return null;
+  }
+
+  return new ImageKit({
+    publicKey: IMAGEKIT_PUBLIC_KEY,
+    privateKey: IMAGEKIT_PRIVATE_KEY,
+    urlEndpoint: IMAGEKIT_PUBLIC_URL,
+  });
+}
+
+const imageKitClient = createImageKitClient();
+
+function toAuthParameters(auth: unknown): ImageKitAuthParameters {
+  const authObject = auth as Record<string, unknown>;
+
+  return {
+    token: String(authObject.token ?? ""),
+    expire: Number(authObject.expire ?? 0),
+    signature: String(authObject.signature ?? ""),
+  };
+}
+
+export function buildRfqUploadSignature(
+  input: RfqUploadSignatureInput,
+): RfqUploadSignatureResult {
+  const normalizedMimeType = normalizeMimeType(input.mimeType);
+  const normalizedFileName = sanitizeFileName(input.fileName);
+  const fileType = inferFileType(normalizedFileName, normalizedMimeType);
+
+  if (!fileType) {
+    throw new Error("Unsupported file extension or MIME type.");
+  }
+
+  if (input.size > RFQ_MAX_FILE_SIZE_BYTES) {
+    throw new Error("File size exceeds the maximum of 10MB.");
+  }
+
+  const extension = getFileExtension(normalizedFileName);
+  const isAllowedExtension = RFQ_ALLOWED_EXTENSIONS.includes(
+    extension as (typeof RFQ_ALLOWED_EXTENSIONS)[number],
+  );
+
+  if (!isAllowedExtension || !isAllowedRfqMimeType(normalizedMimeType, fileType)) {
+    throw new Error("Unsupported file extension or MIME type.");
+  }
+
+  if (!imageKitClient || !IMAGEKIT_PUBLIC_KEY) {
+    return {
+      mode: "mock",
+      mockPublicUrlBase: `${IMAGEKIT_PUBLIC_URL}/rfq/mock`,
+      fileName: normalizedFileName,
+    };
+  }
+
+  const auth = toAuthParameters(imageKitClient.getAuthenticationParameters());
+
+  return {
+    mode: "imagekit",
+    uploadUrl: "https://upload.imagekit.io/api/v1/files/upload",
+    publicKey: IMAGEKIT_PUBLIC_KEY,
+    folder: `/rfq/${new Date().getUTCFullYear()}/${input.projectType.toLowerCase()}`,
+    fileName: normalizedFileName,
+    token: auth.token,
+    expire: auth.expire,
+    signature: auth.signature,
+  };
+}
+
+export async function verifyRfqUploadedFile(
+  file: RfqUploadedFileVerificationInput,
+): Promise<boolean> {
+  if (!isAllowedRfqMimeType(file.mimeType, file.type)) {
+    return false;
+  }
+
+  if (!imageKitClient || !file.fileId) {
+    return file.url.includes("imagekit.io");
+  }
+
+  const details = (await imageKitClient.getFileDetails(file.fileId)) as unknown as {
+    mime?: string;
+    url?: string;
+  };
+  const resolvedMimeType = normalizeMimeType(String(details.mime ?? ""));
+  const resolvedUrl = String(details.url ?? "");
+
+  if (!resolvedUrl || !file.url.startsWith(resolvedUrl)) {
+    return false;
+  }
+
+  return isAllowedRfqMimeType(resolvedMimeType, file.type);
 }
 
 async function createUploadSignature(

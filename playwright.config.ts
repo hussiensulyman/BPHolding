@@ -30,9 +30,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev",
+    command: "npm run build && npm run start",
     url: `${baseURL}/ar`,
-    timeout: 240000,
-    reuseExistingServer: !process.env.CI,
+    timeout: 600000,
+    reuseExistingServer: false,
+    env: {
+      RFQ_RATE_LIMIT_MAX: "20",
+      RFQ_RATE_LIMIT_WINDOW_MS: "3600000",
+    },
   },
 });

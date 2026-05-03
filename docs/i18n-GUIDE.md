@@ -8,7 +8,7 @@
 
 ## Routing
 
-- Locale-prefixed routes are enforced by `src/middleware.ts` using `next-intl`.
+- Locale-prefixed routes are enforced by `src/proxy.ts` using `next-intl`.
 - `localeDetection: true` is enabled in `src/i18n/routing.ts` to redirect based on `Accept-Language`.
 - Locale is preserved on navigation with `LanguageSwitcher` (`router.replace(pathname, {locale})`).
 - Locale is preserved on navigation with `LocalizedLink` (injects current locale into internal hrefs).
