@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "BP Holding | Premium Construction & Engineering",
+    "description": "Integrated engineering and construction services aligned with Saudi Vision 2030."
+  },
+  "home": {
+    "badge": "Premium Construction & Engineering Solutions",
+    "headline": "We Build the Future with Integrated Solutions",
+    "subheadline": "Business Pioneers (BP) is the foundational company of BP Holding, delivering consultancy, contracting, and MEP excellence through a team with over 20 years of leadership experience.",
+    "missionTitle": "Our Mission",
+    "mission": "Transform ambitious architectural ideas into tangible realities through high-end technical services and precision-led execution.",
+    "visionTitle": "Our Vision",
+    "vision": "Lead the engineering landscape through innovation, sustainability, and unparalleled quality.",
+    "servicesTitle": "Core Services",
+    "service1": "Engineering Consultancy",
+    "service2": "General Construction & Contracting",
+    "service3": "MEP Services (Mechanical, Electrical, Plumbing)",
+    "service4": "Renovation & Retrofitting",
+    "toggleLabel": "Switch language",
+    "switchTo": "العربية",
+    "directionIcon": "Directional indicator"
+  }
+}

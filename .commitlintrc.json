@@ -1,0 +1,34 @@
+{
+  "extends": ["@commitlint/config-conventional"],
+  "rules": {
+    "type-enum": [
+      2,
+      "always",
+      ["feat", "fix", "docs", "style", "refactor", "perf", "test", "chore"]
+    ],
+    "scope-enum": [
+      2,
+      "always",
+      [
+        "auth",
+        "i18n",
+        "rtl",
+        "portfolio",
+        "rfq",
+        "careers",
+        "admin",
+        "hr",
+        "store",
+        "pegn",
+        "community",
+        "chatbot",
+        "seo",
+        "db",
+        "imagekit",
+        "ui",
+        "forms",
+        "init"
+      ]
+    ]
+  }
+}
