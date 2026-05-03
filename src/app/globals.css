@@ -27,18 +27,19 @@
 
 body {
   min-height: 100vh;
-  background: radial-gradient(
-      circle at 20% 0%,
-      rgba(223, 154, 19, 0.18),
-      transparent 45%
-    ),
+  background:
+    radial-gradient(circle at 20% 0%, rgba(223, 154, 19, 0.18), transparent 45%),
     linear-gradient(180deg, #ffffff 0%, var(--color-background) 65%);
   color: var(--color-foreground);
-  font-family: var(--font-en-inter), sans-serif;
+  font-family:
+    var(--font-en-inter), var(--font-en-manrope),
+    var(--font-fallback-en, "Segoe UI", "Helvetica Neue", Arial, sans-serif);
 }
 
 html[dir="rtl"] body {
-  font-family: var(--font-ar-cairo), sans-serif;
+  font-family:
+    var(--font-ar-cairo), var(--font-ar-plex),
+    var(--font-fallback-ar, Tahoma, Arial, sans-serif);
 }
 
 .surface-card {
@@ -51,11 +52,25 @@ html[dir="rtl"] body {
   padding-inline: clamp(1rem, 2vw, 2rem);
 }
 
+.text-flow-start {
+  text-align: start;
+}
+
+.inline-start-gap {
+  margin-inline-start: 0.5rem;
+}
+
+.inline-start-anchor {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+}
+
 .icon-flip {
   display: inline-flex;
   transition: transform 180ms ease;
 }
 
-html[dir="rtl"] .icon-flip {
+[dir="rtl"] .icon-flip,
+[dir="rtl"] .carousel-flip {
   transform: scaleX(-1);
 }

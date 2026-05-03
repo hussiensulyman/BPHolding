@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 
 import type { AppLocale } from "@/lib/config/app-config";
 
@@ -9,9 +9,7 @@ type LocaleDirectionContextValue = {
   direction: "rtl" | "ltr";
 };
 
-const LocaleDirectionContext = createContext<LocaleDirectionContextValue | null>(
-  null,
-);
+const LocaleDirectionContext = createContext<LocaleDirectionContextValue | null>(null);
 
 type LocaleDirectionProviderProps = {
   locale: AppLocale;
@@ -24,6 +22,11 @@ export function LocaleDirectionProvider({
   direction,
   children,
 }: LocaleDirectionProviderProps) {
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.documentElement.dir = direction;
+  }, [locale, direction]);
+
   return (
     <LocaleDirectionContext.Provider value={{ locale, direction }}>
       {children}
@@ -35,7 +38,9 @@ export function useLocaleDirectionContext() {
   const context = useContext(LocaleDirectionContext);
 
   if (!context) {
-    throw new Error("useLocaleDirectionContext must be used within LocaleDirectionProvider");
+    throw new Error(
+      "useLocaleDirectionContext must be used within LocaleDirectionProvider",
+    );
   }
 
   return context;

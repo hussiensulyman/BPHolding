@@ -1,13 +1,14 @@
 export const APP_CONFIG = {
   brandName: "BP Holding",
-  locales: ["ar", "en"] as const,
+  locales: ["en", "ar"] as const,
   defaultLocale: "ar",
   brandColors: {
     primary: "#052a42",
     secondary: "#df9a13",
   },
   testIds: {
-    languageToggle: "language-toggle",
+    languageSwitcher: "language-switcher",
+    languageSwitcherIcon: "language-switcher-icon",
     portfolioProjectItem: "portfolio-project-item",
   },
 } as const;

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
-import { LanguageToggle } from "@/components/layout/language-toggle";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { LocalizedLink } from "@/components/layout/LocalizedLink";
 import type { AppLocale } from "@/lib/config/app-config";
 
 export default async function HomePage({
@@ -19,7 +20,7 @@ export default async function HomePage({
           <span className="rounded-full bg-secondary/20 px-3 py-1 text-sm font-semibold text-primary">
             {t("badge")}
           </span>
-          <LanguageToggle />
+          <LanguageSwitcher />
         </div>
       </header>
 
@@ -34,17 +35,23 @@ export default async function HomePage({
 
       <section className="grid gap-6 md:grid-cols-2">
         <article className="surface-card px-inline-4 py-6">
-          <h2 className="text-start text-2xl font-bold text-primary">{t("missionTitle")}</h2>
+          <h2 className="text-start text-2xl font-bold text-primary">
+            {t("missionTitle")}
+          </h2>
           <p className="text-start mt-3 leading-7 text-slate-700">{t("mission")}</p>
         </article>
         <article className="surface-card px-inline-4 py-6">
-          <h2 className="text-start text-2xl font-bold text-primary">{t("visionTitle")}</h2>
+          <h2 className="text-start text-2xl font-bold text-primary">
+            {t("visionTitle")}
+          </h2>
           <p className="text-start mt-3 leading-7 text-slate-700">{t("vision")}</p>
         </article>
       </section>
 
       <section className="surface-card px-inline-4 py-6">
-        <h2 className="text-start text-2xl font-bold text-primary">{t("servicesTitle")}</h2>
+        <h2 className="text-start text-2xl font-bold text-primary">
+          {t("servicesTitle")}
+        </h2>
         <ul className="mt-4 grid gap-3 md:grid-cols-2">
           <li className="rounded-xl bg-white/90 px-4 py-3 text-start text-slate-700">
             {t("service1")}
@@ -60,12 +67,12 @@ export default async function HomePage({
           </li>
         </ul>
         <div className="mt-6">
-          <a
-            href={`/${activeLocale}/portfolio`}
+          <LocalizedLink
+            href="/portfolio"
             className="inline-flex items-center rounded-full bg-primary px-5 py-2 font-semibold text-white transition hover:bg-primary/90"
           >
             {t("portfolioCta")}
-          </a>
+          </LocalizedLink>
         </div>
       </section>
     </main>

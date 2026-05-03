@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import { LocalizedLink } from "@/components/layout/LocalizedLink";
 import { APP_CONFIG, type AppLocale } from "@/lib/config/app-config";
 import { getPortfolioProjects } from "@/lib/data/portfolio-service";
 
@@ -23,12 +23,12 @@ export default async function PortfolioPage({
         <p className="text-start mt-4 max-w-3xl text-lg leading-8 text-slate-700">
           {t("description")}
         </p>
-        <Link
-          href={`/${activeLocale}`}
+        <LocalizedLink
+          href="/"
           className="mt-6 inline-flex items-center rounded-full border border-primary/30 px-5 py-2 font-semibold text-primary transition hover:bg-primary hover:text-white"
         >
           {t("backToHome")}
-        </Link>
+        </LocalizedLink>
       </header>
 
       <section className="grid gap-6 md:grid-cols-2">
@@ -38,7 +38,9 @@ export default async function PortfolioPage({
             data-testid={APP_CONFIG.testIds.portfolioProjectItem}
             className="surface-card px-inline-4 py-6"
           >
-            <h2 className="text-start text-2xl font-bold text-primary">{project.title}</h2>
+            <h2 className="text-start text-2xl font-bold text-primary">
+              {project.title}
+            </h2>
             <p className="text-start mt-3 leading-7 text-slate-700">{project.summary}</p>
             <dl className="mt-4 grid gap-2 text-sm text-slate-600">
               <div className="flex items-center gap-2">

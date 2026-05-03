@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("homepage renders bilingual toggle", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByTestId("language-toggle")).toBeVisible();
+  await expect(page.getByTestId("language-switcher")).toBeVisible();
 });
 
 test("language toggle switches locale and direction", async ({ page }) => {
@@ -12,7 +12,7 @@ test("language toggle switches locale and direction", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("نبني المستقبل");
 
-  await page.getByTestId("language-toggle").click();
+  await page.getByTestId("language-switcher").selectOption("en");
 
   await expect(page).toHaveURL(/\/en$/);
   await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
@@ -24,6 +24,8 @@ test("language toggle switches locale and direction", async ({ page }) => {
 test("portfolio page loads sample projects from seed data", async ({ page }) => {
   await page.goto("/ar/portfolio");
 
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("نماذج من مشاريعنا");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "نماذج من مشاريعنا",
+  );
   await expect(page.getByTestId("portfolio-project-item")).toHaveCount(3);
 });

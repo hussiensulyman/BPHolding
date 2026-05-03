@@ -21,6 +21,11 @@
     "switchTo": "العربية",
     "directionIcon": "Directional indicator"
   },
+  "languageSwitcher": {
+    "label": "Language",
+    "arabicOption": "🇸🇦 العربية (Arabic)",
+    "englishOption": "🇺🇸 English (الإنجليزية)"
+  },
   "portfolio": {
     "title": "Selected Project Portfolio",
     "description": "Sample projects seeded for Phase 1 preview and data-flow verification.",

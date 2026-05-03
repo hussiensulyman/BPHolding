@@ -21,6 +21,11 @@
     "switchTo": "English",
     "directionIcon": "مؤشر الاتجاه"
   },
+  "languageSwitcher": {
+    "label": "اللغة",
+    "arabicOption": "🇸🇦 العربية (Arabic)",
+    "englishOption": "🇺🇸 English (الإنجليزية)"
+  },
   "portfolio": {
     "title": "نماذج من مشاريعنا",
     "description": "مشاريع تجريبية من بيانات Seed لعرض المرحلة الأولى والتحقق من تدفق البيانات.",
