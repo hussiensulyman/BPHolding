@@ -8,11 +8,33 @@ datasource db {
 }
 
 enum Role {
-  SUPER_ADMIN
   ADMIN
-  HR
-  SALES
+  EMPLOYEE
+  CONTRACTOR
   CLIENT
+  PUBLIC
+}
+
+enum ProjectCategory {
+  RESIDENTIAL
+  COMMERCIAL
+  INTERIOR
+  ENGINEERING
+  MEP
+  RENOVATION
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum SubmissionStatus {
+  NEW
+  REVIEWED
+  CONTACTED
+  ARCHIVED
 }
 
 model User {
@@ -20,8 +42,168 @@ model User {
   email        String   @unique
   name         String
   passwordHash String
-  role         Role     @default(CLIENT)
+  role         Role     @default(PUBLIC)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  profile                         Profile?
+  projects                        Project[]                @relation("ProjectOwner")
+  rfqSubmissionsReviewed          RFQSubmission[]          @relation("RFQReviewer")
+  jobApplicationsReviewed         JobApplication[]         @relation("JobReviewer")
+  contractorRegistrationsReviewed ContractorRegistration[] @relation("ContractorReviewer")
+  certifications                  Certification[]          @relation("CertificationIssuer")
+  auditLogs                       AuditLog[]               @relation("AuditActor")
+
+  @@index([email], map: "idx_users_email")
+  @@index([role], map: "idx_users_role")
+  @@map("users")
+}
+
+model Profile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  phone            String?
+  position         String?
+  bioEn            String?
+  bioAr            String?
+  companyMissionEn String?
+  companyMissionAr String?
+  companyVisionEn  String?
+  companyVisionAr  String?
+  coreServicesEn   String[] @default([])
+  coreServicesAr   String[] @default([])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Project {
+  id            String          @id @default(cuid())
+  slug          String          @unique
+  titleEn       String
+  titleAr       String
+  descriptionEn String
+  descriptionAr String
+  location      String
+  city          String
+  category      ProjectCategory
+  status        PublishStatus   @default(DRAFT)
+  featured      Boolean         @default(false)
+  completedAt   DateTime?
+  sortOrder     Int             @default(0)
+  ownerId       String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  owner User? @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([category, status], map: "idx_projects_category_status")
+  @@index([featured, status], map: "idx_projects_featured_status")
+  @@map("projects")
+}
+
+model RFQSubmission {
+  id              String           @id @default(cuid())
+  fullName        String
+  email           String
+  phone           String
+  companyName     String?
+  serviceType     String?
+  projectLocation String?
+  estimatedBudget String?
+  message         String
+  status          SubmissionStatus @default(NEW)
+  submittedAt     DateTime         @default(now())
+  reviewedAt      DateTime?
+  handledById     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  handledBy User? @relation("RFQReviewer", fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([submittedAt], map: "idx_rfq_submissions_submitted_at")
+  @@map("rfq_submissions")
+}
+
+model JobApplication {
+  id              String           @id @default(cuid())
+  fullName        String
+  email           String
+  phone           String
+  positionApplied String
+  coverLetterEn   String?
+  coverLetterAr   String?
+  resumeUrl       String?
+  status          SubmissionStatus @default(NEW)
+  submittedAt     DateTime         @default(now())
+  reviewedAt      DateTime?
+  handledById     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  handledBy User? @relation("JobReviewer", fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([submittedAt], map: "idx_job_applications_submitted_at")
+  @@map("job_applications")
+}
+
+model ContractorRegistration {
+  id          String           @id @default(cuid())
+  companyName String
+  contactName String
+  email       String
+  phone       String
+  website     String?
+  servicesEn  String[]         @default([])
+  servicesAr  String[]         @default([])
+  notes       String?
+  status      SubmissionStatus @default(NEW)
+  submittedAt DateTime         @default(now())
+  reviewedAt  DateTime?
+  handledById String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  handledBy      User?           @relation("ContractorReviewer", fields: [handledById], references: [id], onDelete: SetNull)
+  certifications Certification[]
+
+  @@index([submittedAt], map: "idx_contractor_registrations_submitted_at")
+  @@map("contractor_registrations")
+}
+
+model Certification {
+  id                        String   @id @default(cuid())
+  contractorRegistrationId  String?
+  issuedById                String?
+  title                     String
+  issuingAuthority          String
+  certificateNumber         String?
+  issuedAt                  DateTime
+  expiresAt                 DateTime?
+  certificateUrl            String?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  contractorRegistration ContractorRegistration? @relation(fields: [contractorRegistrationId], references: [id], onDelete: Cascade)
+  issuedBy               User?                   @relation("CertificationIssuer", fields: [issuedById], references: [id], onDelete: SetNull)
+
+  @@map("certifications")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
 }

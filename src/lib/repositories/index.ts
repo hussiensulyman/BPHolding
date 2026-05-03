@@ -1,8 +1,15 @@
-import type { UserRepository } from "@/lib/repositories/contracts/user-repository";
+import type { IProjectRepository } from "@/lib/repositories/contracts/project-repository";
+import type { IUserRepository } from "@/lib/repositories/contracts/user-repository";
+import { PrismaProjectRepository } from "@/lib/repositories/prisma/prisma-project-repository";
 import { PrismaUserRepository } from "@/lib/repositories/prisma/prisma-user-repository";
 
-export function createUserRepository(): UserRepository {
-	return new PrismaUserRepository();
+export function createUserRepository(): IUserRepository {
+  return new PrismaUserRepository();
 }
 
-export const userRepository: UserRepository = createUserRepository();
+export function createProjectRepository(): IProjectRepository {
+  return new PrismaProjectRepository();
+}
+
+export const userRepository: IUserRepository = createUserRepository();
+export const projectRepository: IProjectRepository = createProjectRepository();

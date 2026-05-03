@@ -1,9 +1,12 @@
 import type { PrismaClient, User } from "@prisma/client";
 
-import type { CreateUserInput, UserRepository } from "@/lib/repositories/contracts/user-repository";
-import { prisma } from "@/lib/prisma";
+import type {
+  CreateUserInput,
+  IUserRepository,
+} from "@/lib/repositories/contracts/user-repository";
+import { prisma } from "@/lib/db";
 
-export class PrismaUserRepository implements UserRepository {
+export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prismaClient: Pick<PrismaClient, "user"> = prisma) {}
 
   findByEmail(email: string): Promise<User | null> {

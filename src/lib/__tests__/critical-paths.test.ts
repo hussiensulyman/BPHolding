@@ -8,10 +8,9 @@ import { validateRfqForm } from "@/lib/validation/rfq-form.schema";
 describe("critical paths", () => {
   it("authorizes project management only for admin roles", () => {
     expect(canManageProjects("ADMIN")).toBe(true);
-    expect(canManageProjects("SUPER_ADMIN")).toBe(true);
     expect(canManageProjects("CLIENT")).toBe(false);
-    expect(hasMinimumRole("HR", "SALES")).toBe(true);
-    expect(hasMinimumRole("SALES", "HR")).toBe(false);
+    expect(hasMinimumRole("ADMIN", "CLIENT")).toBe(true);
+    expect(hasMinimumRole("CLIENT", "ADMIN")).toBe(false);
   });
 
   it("validates RFQ payload server-side with MIME and size checks", () => {
