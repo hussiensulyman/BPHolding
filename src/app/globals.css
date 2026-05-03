@@ -25,6 +25,11 @@
   --color-foreground: #f4f7fb;
 }
 
+.font-fallback-vars {
+  --font-fallback-en: "Inter", "Manrope", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-fallback-ar: "Cairo", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
+}
+
 body {
   min-height: 100vh;
   background:

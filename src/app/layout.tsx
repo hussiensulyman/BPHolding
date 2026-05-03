@@ -1,6 +1,6 @@
 import { Cairo, IBM_Plex_Sans_Arabic, Inter, Manrope } from "next/font/google";
 import { getLocale } from "next-intl/server";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { APP_CONFIG } from "@/lib/config/app-config";
 import { getLocaleDirection, isSupportedLocale } from "@/lib/utils/locale";
@@ -28,12 +28,6 @@ const arPlex = IBM_Plex_Sans_Arabic({
   weight: ["400", "500", "600", "700"],
 });
 
-const fallbackFontVariables: CSSProperties = {
-  "--font-fallback-en":
-    '"Inter", "Manrope", "Segoe UI", "Helvetica Neue", Arial, sans-serif',
-  "--font-fallback-ar": '"Cairo", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif',
-} as CSSProperties;
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -52,9 +46,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${enInter.variable} ${enManrope.variable} ${arCairo.variable} ${arPlex.variable}`}
     >
-      <body className="min-h-screen antialiased" style={fallbackFontVariables}>
-        {children}
-      </body>
+      <body className="font-fallback-vars min-h-screen antialiased">{children}</body>
     </html>
   );
 }

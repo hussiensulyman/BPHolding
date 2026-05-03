@@ -2,7 +2,7 @@
 
 import { useLocale as useIntlLocale, useTranslations } from "next-intl";
 
-import { APP_CONFIG, type AppLocale } from "@/lib/config/app-config";
+import { APP_CONFIG } from "@/lib/config/app-config";
 import { getLocaleDirection, isSupportedLocale } from "@/lib/utils/locale";
 
 export function useLocale<Namespace extends string = string>(namespace?: Namespace) {

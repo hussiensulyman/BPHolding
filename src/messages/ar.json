@@ -29,7 +29,11 @@
   "portfolio": {
     "title": "نماذج من مشاريعنا",
     "description": "مشاريع تجريبية من بيانات Seed لعرض المرحلة الأولى والتحقق من تدفق البيانات.",
+    "studioTitle": "استوديو المشاريع",
+    "studioDescription": "استعرض مشاريع بي بي القابضة عبر مرشحات ذكية حسب الفئة والمدينة والسنة والبحث.",
     "backToHome": "العودة للرئيسية",
+    "backToPortfolio": "العودة إلى الأعمال",
+    "specsTitle": "مواصفات المشروع",
     "statusLabel": "الحالة",
     "sectorLabel": "القطاع",
     "statusValues": {

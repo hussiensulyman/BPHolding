@@ -24,8 +24,6 @@ test("language toggle switches locale and direction", async ({ page }) => {
 test("portfolio page loads sample projects from seed data", async ({ page }) => {
   await page.goto("/ar/portfolio");
 
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "نماذج من مشاريعنا",
-  );
-  await expect(page.getByTestId("portfolio-project-item")).toHaveCount(3);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("استوديو المشاريع");
+  await expect(page.getByTestId("portfolio-project-item")).toHaveCount(7);
 });

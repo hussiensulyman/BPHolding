@@ -8,6 +8,9 @@ const serverEnvironmentSchema = z.object({
   NEXTAUTH_SECRET: z.string().min(32).optional(),
   IMAGEKIT_PUBLIC_KEY: z.string().optional(),
   IMAGEKIT_PRIVATE_KEY: z.string().optional(),
+  NEXT_PUBLIC_IMAGEKIT_URL_PUBLIC: z.string().url().optional(),
+  IMAGEKIT_URL_PUBLIC: z.string().url().optional(),
+  IMAGEKIT_URL_PRIVATE: z.string().optional(),
   IMAGEKIT_URL_ENDPOINT: z.string().url().optional(),
 });
 
@@ -19,5 +22,8 @@ export const serverEnvironment = serverEnvironmentSchema.safeParse({
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   IMAGEKIT_PUBLIC_KEY: process.env.IMAGEKIT_PUBLIC_KEY,
   IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
+  NEXT_PUBLIC_IMAGEKIT_URL_PUBLIC: process.env.NEXT_PUBLIC_IMAGEKIT_URL_PUBLIC,
+  IMAGEKIT_URL_PUBLIC: process.env.IMAGEKIT_URL_PUBLIC,
+  IMAGEKIT_URL_PRIVATE: process.env.IMAGEKIT_URL_PRIVATE,
   IMAGEKIT_URL_ENDPOINT: process.env.IMAGEKIT_URL_ENDPOINT,
 });

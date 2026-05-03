@@ -1,78 +1,15 @@
-import { PrismaClient, Role } from "@prisma/client";
-import { fileURLToPath } from "node:url";
+import type {
+  CreateProjectInput,
+  IProjectRepository,
+  ListPublishedProjectsInput,
+  ListPublishedProjectsResult,
+  ProjectCategoryValue,
+  ProjectRecord,
+} from "@/lib/repositories/contracts/project-repository";
 
-const prisma = new PrismaClient();
-
-type ProjectCategoryValue =
-  | "RESIDENTIAL"
-  | "COMMERCIAL"
-  | "INTERIOR"
-  | "ENGINEERING"
-  | "MEP"
-  | "RENOVATION";
-
-type PublishStatusValue = "DRAFT" | "PUBLISHED" | "ARCHIVED";
-
-type SeedProjectRecord = {
-  slug: string;
-  titleEn: string;
-  titleAr: string;
-  descriptionEn: string;
-  descriptionAr: string;
-  location: string;
-  city: string;
-  category: ProjectCategoryValue;
-  status: PublishStatusValue;
-  featured: boolean;
-  completedAt?: Date;
-  sortOrder: number;
-};
-
-type SeedClient = {
-  user: {
-    upsert(args: unknown): Promise<{ id: string }>;
-  };
-  profile: {
-    upsert(args: unknown): Promise<unknown>;
-  };
-  project: {
-    upsert(args: unknown): Promise<unknown>;
-  };
-  auditLog: {
-    create(args: unknown): Promise<unknown>;
-  };
-};
-
-export const ADMIN_EMAIL = "admin@bpholding.net";
-
-export const CORE_SERVICES = {
-  en: [
-    "MEP Services (Mechanical, Electrical, Plumbing)",
-    "Engineering Consultancy",
-    "Renovation & Retrofitting",
-    "General Construction & Contracting",
-  ],
-  ar: [
-    "خدمات الأنظمة الكهروميكانيكية (الميكانيكية والكهربائية والسباكة)",
-    "الاستشارات الهندسية",
-    "التجديد وإعادة التأهيل",
-    "الإنشاءات والمقاولات العامة",
-  ],
-} as const;
-
-export const COMPANY_PROFILE_CONTENT = {
-  mission: {
-    en: "Transform ambitious architectural ideas into tangible realities through high-end technical services and precision-led execution.",
-    ar: "تحويل الأفكار المعمارية الطموحة إلى واقع ملموس من خلال خدمات تقنية عالية وتنفيذ دقيق.",
-  },
-  vision: {
-    en: "Lead the engineering landscape through innovation, sustainability, and unparalleled quality.",
-    ar: "قيادة المشهد الهندسي بالابتكار والاستدامة وجودة لا تضاهى.",
-  },
-} as const;
-
-export const PREVIOUS_PROJECTS: SeedProjectRecord[] = [
+const FALLBACK_PROJECTS: ProjectRecord[] = [
   {
+    id: "fallback-al-fursan",
     slug: "al-fursan-residential-compound-riyadh",
     titleEn: "Al-Fursan Residential Compound - Riyadh",
     titleAr: "مجمع الفرسان السكني - الرياض",
@@ -87,8 +24,12 @@ export const PREVIOUS_PROJECTS: SeedProjectRecord[] = [
     featured: true,
     completedAt: new Date("2024-03-10T00:00:00.000Z"),
     sortOrder: 1,
+    ownerId: null,
+    createdAt: new Date("2024-03-10T00:00:00.000Z"),
+    updatedAt: new Date("2024-03-10T00:00:00.000Z"),
   },
   {
+    id: "fallback-al-malqa",
     slug: "al-malqa-mixed-use-development-riyadh",
     titleEn: "Al-Malqa Mixed-Use Development - Riyadh",
     titleAr: "تطوير متعدد الاستخدامات في الملقا - الرياض",
@@ -103,8 +44,12 @@ export const PREVIOUS_PROJECTS: SeedProjectRecord[] = [
     featured: true,
     completedAt: new Date("2023-11-18T00:00:00.000Z"),
     sortOrder: 2,
+    ownerId: null,
+    createdAt: new Date("2023-11-18T00:00:00.000Z"),
+    updatedAt: new Date("2023-11-18T00:00:00.000Z"),
   },
   {
+    id: "fallback-prince-fawaz",
     slug: "prince-fawaz-community-facilities-jeddah",
     titleEn: "Prince Fawaz Community Facilities - Jeddah",
     titleAr: "مرافق مجتمعية في حي الأمير فواز - جدة",
@@ -119,8 +64,12 @@ export const PREVIOUS_PROJECTS: SeedProjectRecord[] = [
     featured: false,
     completedAt: new Date("2022-06-05T00:00:00.000Z"),
     sortOrder: 3,
+    ownerId: null,
+    createdAt: new Date("2022-06-05T00:00:00.000Z"),
+    updatedAt: new Date("2022-06-05T00:00:00.000Z"),
   },
   {
+    id: "fallback-al-janaderiyah",
     slug: "al-janaderiyah-urban-housing-riyadh",
     titleEn: "Al-Janaderiyah Urban Housing - Riyadh",
     titleAr: "إسكان حضري في الجنادرية - الرياض",
@@ -135,8 +84,12 @@ export const PREVIOUS_PROJECTS: SeedProjectRecord[] = [
     featured: false,
     completedAt: new Date("2024-08-22T00:00:00.000Z"),
     sortOrder: 4,
+    ownerId: null,
+    createdAt: new Date("2024-08-22T00:00:00.000Z"),
+    updatedAt: new Date("2024-08-22T00:00:00.000Z"),
   },
   {
+    id: "fallback-al-yasmin",
     slug: "al-yasmin-premium-villas-riyadh",
     titleEn: "Al-Yasmin Premium Villas - Riyadh",
     titleAr: "فلل الياسمين الفاخرة - الرياض",
@@ -151,8 +104,12 @@ export const PREVIOUS_PROJECTS: SeedProjectRecord[] = [
     featured: true,
     completedAt: new Date("2025-01-16T00:00:00.000Z"),
     sortOrder: 5,
+    ownerId: null,
+    createdAt: new Date("2025-01-16T00:00:00.000Z"),
+    updatedAt: new Date("2025-01-16T00:00:00.000Z"),
   },
   {
+    id: "fallback-al-shatea",
     slug: "al-shatea-commercial-offices-jeddah",
     titleEn: "Al-Shatea Commercial Offices - Jeddah",
     titleAr: "مكاتب تجارية في الشاطئ - جدة",
@@ -167,8 +124,12 @@ export const PREVIOUS_PROJECTS: SeedProjectRecord[] = [
     featured: false,
     completedAt: new Date("2023-04-30T00:00:00.000Z"),
     sortOrder: 6,
+    ownerId: null,
+    createdAt: new Date("2023-04-30T00:00:00.000Z"),
+    updatedAt: new Date("2023-04-30T00:00:00.000Z"),
   },
   {
+    id: "fallback-al-arid",
     slug: "al-arid-residential-expansion-riyadh",
     titleEn: "Al-Arid Residential Expansion - Riyadh",
     titleAr: "توسعة سكنية في العارض - الرياض",
@@ -183,110 +144,137 @@ export const PREVIOUS_PROJECTS: SeedProjectRecord[] = [
     featured: false,
     completedAt: new Date("2024-12-01T00:00:00.000Z"),
     sortOrder: 7,
+    ownerId: null,
+    createdAt: new Date("2024-12-01T00:00:00.000Z"),
+    updatedAt: new Date("2024-12-01T00:00:00.000Z"),
   },
-] as const;
+];
 
-export async function seedBpHoldingContent(client: SeedClient): Promise<void> {
-  const adminUser = await client.user.upsert({
-    where: { email: ADMIN_EMAIL },
-    update: {
-      name: "BP Holding Admin",
-      role: Role.ADMIN,
-      isActive: true,
-    },
-    create: {
-      email: ADMIN_EMAIL,
-      name: "BP Holding Admin",
-      passwordHash: "CHANGE_ME_WITH_SECURE_HASH",
-      role: Role.ADMIN,
-      isActive: true,
-    },
+function sortProjects(projects: ProjectRecord[]): ProjectRecord[] {
+  return [...projects].sort((a, b) => {
+    if (a.featured !== b.featured) {
+      return a.featured ? -1 : 1;
+    }
+
+    if (a.sortOrder !== b.sortOrder) {
+      return a.sortOrder - b.sortOrder;
+    }
+
+    return b.createdAt.getTime() - a.createdAt.getTime();
   });
+}
 
-  await client.profile.upsert({
-    where: { userId: adminUser.id },
-    update: {
-      position: "Group Administrator",
-      companyMissionEn: COMPANY_PROFILE_CONTENT.mission.en,
-      companyMissionAr: COMPANY_PROFILE_CONTENT.mission.ar,
-      companyVisionEn: COMPANY_PROFILE_CONTENT.vision.en,
-      companyVisionAr: COMPANY_PROFILE_CONTENT.vision.ar,
-      coreServicesEn: [...CORE_SERVICES.en],
-      coreServicesAr: [...CORE_SERVICES.ar],
-    },
-    create: {
-      userId: adminUser.id,
-      position: "Group Administrator",
-      companyMissionEn: COMPANY_PROFILE_CONTENT.mission.en,
-      companyMissionAr: COMPANY_PROFILE_CONTENT.mission.ar,
-      companyVisionEn: COMPANY_PROFILE_CONTENT.vision.en,
-      companyVisionAr: COMPANY_PROFILE_CONTENT.vision.ar,
-      coreServicesEn: [...CORE_SERVICES.en],
-      coreServicesAr: [...CORE_SERVICES.ar],
-    },
-  });
+function getProjectYear(project: ProjectRecord): number {
+  return (project.completedAt ?? project.createdAt).getUTCFullYear();
+}
 
-  for (const project of PREVIOUS_PROJECTS) {
-    await client.project.upsert({
-      where: { slug: project.slug },
-      update: {
-        titleEn: project.titleEn,
-        titleAr: project.titleAr,
-        descriptionEn: project.descriptionEn,
-        descriptionAr: project.descriptionAr,
-        location: project.location,
-        city: project.city,
-        category: project.category,
-        status: project.status,
-        featured: project.featured,
-        completedAt: project.completedAt,
-        sortOrder: project.sortOrder,
-        ownerId: adminUser.id,
-      },
-      create: {
-        slug: project.slug,
-        titleEn: project.titleEn,
-        titleAr: project.titleAr,
-        descriptionEn: project.descriptionEn,
-        descriptionAr: project.descriptionAr,
-        location: project.location,
-        city: project.city,
-        category: project.category,
-        status: project.status,
-        featured: project.featured,
-        completedAt: project.completedAt,
-        sortOrder: project.sortOrder,
-        ownerId: adminUser.id,
-      },
-    });
+function matchesSearch(project: ProjectRecord, search?: string): boolean {
+  const normalized = search?.trim().toLowerCase();
+
+  if (!normalized) {
+    return true;
   }
 
-  await client.auditLog.create({
-    data: {
-      actorId: adminUser.id,
-      action: "SEED_BP_HOLDING_CONTENT",
-      entityType: "SYSTEM",
-      entityId: "bootstrap",
-      metadata: {
-        projectsSeeded: PREVIOUS_PROJECTS.length,
-        servicesSeeded: CORE_SERVICES.en.length,
-      },
-    },
-  });
+  return [
+    project.titleEn,
+    project.titleAr,
+    project.descriptionEn,
+    project.descriptionAr,
+    project.location,
+    project.city,
+  ].some((value) => value.toLowerCase().includes(normalized));
 }
 
-async function main(): Promise<void> {
-  await seedBpHoldingContent(prisma as unknown as SeedClient);
-}
+export class InMemoryProjectRepository implements IProjectRepository {
+  private projects: ProjectRecord[] = sortProjects(FALLBACK_PROJECTS);
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  main()
-    .then(async () => {
-      await prisma.$disconnect();
-    })
-    .catch(async (error: unknown) => {
-      console.error("Failed to seed BP Holding content", error);
-      await prisma.$disconnect();
-      process.exit(1);
+  async findById(id: string): Promise<ProjectRecord | null> {
+    return this.projects.find((project) => project.id === id) ?? null;
+  }
+
+  async findBySlug(slug: string): Promise<ProjectRecord | null> {
+    return this.projects.find((project) => project.slug === slug) ?? null;
+  }
+
+  async listPublished(category?: ProjectCategoryValue): Promise<ProjectRecord[]> {
+    return this.projects.filter(
+      (project) =>
+        project.status === "PUBLISHED" && (!category || project.category === category),
+    );
+  }
+
+  async listPublishedFiltered(
+    input: ListPublishedProjectsInput = {},
+  ): Promise<ListPublishedProjectsResult> {
+    const page = Math.max(1, input.page ?? 1);
+    const pageSize = Math.max(1, input.pageSize ?? 12);
+
+    const filtered = this.projects.filter((project) => {
+      if (project.status !== "PUBLISHED") {
+        return false;
+      }
+
+      if (input.category && project.category !== input.category) {
+        return false;
+      }
+
+      if (input.city && project.city !== input.city) {
+        return false;
+      }
+
+      if (input.year && getProjectYear(project) !== input.year) {
+        return false;
+      }
+
+      return matchesSearch(project, input.search);
     });
+
+    const sorted = sortProjects(filtered);
+    const start = (page - 1) * pageSize;
+
+    return {
+      items: sorted.slice(start, start + pageSize),
+      total: sorted.length,
+    };
+  }
+
+  async listRelatedByCategory(
+    category: ProjectCategoryValue,
+    excludedSlug: string,
+    limit = 3,
+  ): Promise<ProjectRecord[]> {
+    return sortProjects(
+      this.projects.filter(
+        (project) =>
+          project.status === "PUBLISHED" &&
+          project.category === category &&
+          project.slug !== excludedSlug,
+      ),
+    ).slice(0, limit);
+  }
+
+  async create(input: CreateProjectInput): Promise<ProjectRecord> {
+    const created: ProjectRecord = {
+      id: `in-memory-${Date.now()}`,
+      slug: input.slug,
+      titleEn: input.titleEn,
+      titleAr: input.titleAr,
+      descriptionEn: input.descriptionEn,
+      descriptionAr: input.descriptionAr,
+      location: input.location,
+      city: input.city,
+      category: input.category,
+      status: input.status ?? "DRAFT",
+      featured: input.featured ?? false,
+      completedAt: input.completedAt ?? null,
+      sortOrder: input.sortOrder ?? 0,
+      ownerId: input.ownerId ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.projects = sortProjects([created, ...this.projects]);
+
+    return created;
+  }
 }

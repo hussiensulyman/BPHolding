@@ -29,7 +29,11 @@
   "portfolio": {
     "title": "Selected Project Portfolio",
     "description": "Sample projects seeded for Phase 1 preview and data-flow verification.",
+    "studioTitle": "Portfolio Studio",
+    "studioDescription": "Browse BP Holding projects with smart filters by category, city, year, and search.",
     "backToHome": "Back to Home",
+    "backToPortfolio": "Back to Portfolio",
+    "specsTitle": "Project Specifications",
     "statusLabel": "Status",
     "sectorLabel": "Sector",
     "statusValues": {

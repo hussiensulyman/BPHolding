@@ -34,8 +34,8 @@ describe("db singleton", () => {
     vi.stubEnv("PRISMA_CONNECTION_LIMIT", "33");
     vi.stubEnv("PRISMA_POOL_TIMEOUT_SECONDS", "22");
 
-    const module = await import("@/lib/db");
-    const datasourceUrl = module.buildDatabaseUrl();
+    const dbModule = await import("@/lib/db");
+    const datasourceUrl = dbModule.buildDatabaseUrl();
 
     expect(datasourceUrl).toContain("connection_limit=33");
     expect(datasourceUrl).toContain("pool_timeout=22");

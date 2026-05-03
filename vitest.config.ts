@@ -1,9 +1,17 @@
-import react from "@vitejs/plugin-react-swc";
-import tsconfigPaths from "vite-tsconfig-paths";
+import react from "@vitejs/plugin-react";
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [react()],
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      "@imagekit/next": path.resolve(
+        "node_modules/@imagekit/next/dist/client/index-esm.js",
+      ),
+    },
+  },
   test: {
     globals: true,
     environment: "jsdom",

@@ -148,3 +148,32 @@ flowchart LR
   F --> A
   G --> A
 ```
+
+## Media Handling Strategy
+
+- Delivery: project media is rendered through ImageKit Next components with responsive transformation chains (`w`, `q`, format) and URL-based optimization.
+- Performance defaults: portfolio cards request 800px/85 quality variants for masonry cards, while detail galleries request larger responsive variants.
+- Loading strategy: above-the-fold images are prioritized for preload; below-the-fold cards and gallery thumbnails use lazy loading.
+- Utility layer: `src/lib/imagekit.ts` centralizes upload signing/upload execution and responsive URL generation via environment-based endpoints.
+
+## Caching Strategy
+
+- Portfolio list and detail routes use ISR (`revalidate = 3600`) to keep seeded project data fast and fresh on an hourly window.
+- Server-rendered filtering and pagination are resolved in the service/repository pipeline, then cached at the route level for repeated traffic patterns.
+- Image transformations are delegated to ImageKit CDN URLs so cacheable transformed assets are served from edge locations.
+
+## Portfolio Data Flow
+
+```mermaid
+flowchart LR
+  A[Prisma PostgreSQL] --> B[PrismaProjectRepository]
+  B --> C[PortfolioService / IPortfolioService]
+  C --> D[Server Components]
+  D --> E[FilterBar Client Component]
+  D --> F[PortfolioGrid Client Component]
+  F --> G[ProjectCard Client Component]
+  D --> H[Project Detail + Gallery]
+```
+
+- Dependency inversion: server components call the portfolio service interface, while repository implementations remain swappable.
+- Single responsibility: filtering logic lives in service/repository, grid virtualization in `PortfolioGrid`, project presentation in `ProjectCard`, and filter interaction in `FilterBar`.
