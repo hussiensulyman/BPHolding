@@ -1,8 +1,11 @@
-import { getTranslations } from "next-intl/server";
-
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
-import { LocalizedLink } from "@/components/layout/LocalizedLink";
 import type { AppLocale } from "@/lib/config/app-config";
+import { HeroSection } from "@/components/home/HeroSection";
+import { AboutSection } from "@/components/home/AboutSection";
+import { ServicesSection } from "@/components/home/ServicesSection";
+import { PortfolioPreview } from "@/components/home/PortfolioPreview";
+import { WhyChooseUsSection } from "@/components/home/WhyChooseUsSection";
+import { CertificationsSection } from "@/components/home/CertificationsSection";
+import { ContactSection } from "@/components/home/ContactSection";
 
 export default async function HomePage({
   params,
@@ -11,70 +14,16 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const activeLocale = locale as AppLocale;
-  const t = await getTranslations({ locale: activeLocale, namespace: "home" });
 
   return (
-    <main className="inline-pad mx-inline-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 py-10">
-      <header className="surface-card px-inline-4 py-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <span className="rounded-full bg-secondary/20 px-3 py-1 text-sm font-semibold text-primary">
-            {t("badge")}
-          </span>
-          <LanguageSwitcher />
-        </div>
-      </header>
-
-      <section className="surface-card px-inline-4 py-10">
-        <h1 className="text-start text-4xl font-extrabold text-primary md:text-5xl">
-          {t("headline")}
-        </h1>
-        <p className="text-start mt-5 max-w-3xl text-lg leading-8 text-slate-700">
-          {t("subheadline")}
-        </p>
-      </section>
-
-      <section className="grid gap-6 md:grid-cols-2">
-        <article className="surface-card px-inline-4 py-6">
-          <h2 className="text-start text-2xl font-bold text-primary">
-            {t("missionTitle")}
-          </h2>
-          <p className="text-start mt-3 leading-7 text-slate-700">{t("mission")}</p>
-        </article>
-        <article className="surface-card px-inline-4 py-6">
-          <h2 className="text-start text-2xl font-bold text-primary">
-            {t("visionTitle")}
-          </h2>
-          <p className="text-start mt-3 leading-7 text-slate-700">{t("vision")}</p>
-        </article>
-      </section>
-
-      <section className="surface-card px-inline-4 py-6">
-        <h2 className="text-start text-2xl font-bold text-primary">
-          {t("servicesTitle")}
-        </h2>
-        <ul className="mt-4 grid gap-3 md:grid-cols-2">
-          <li className="rounded-xl bg-white/90 px-4 py-3 text-start text-slate-700">
-            {t("service1")}
-          </li>
-          <li className="rounded-xl bg-white/90 px-4 py-3 text-start text-slate-700">
-            {t("service2")}
-          </li>
-          <li className="rounded-xl bg-white/90 px-4 py-3 text-start text-slate-700">
-            {t("service3")}
-          </li>
-          <li className="rounded-xl bg-white/90 px-4 py-3 text-start text-slate-700">
-            {t("service4")}
-          </li>
-        </ul>
-        <div className="mt-6">
-          <LocalizedLink
-            href="/portfolio"
-            className="inline-flex items-center rounded-full bg-primary px-5 py-2 font-semibold text-white transition hover:bg-primary/90"
-          >
-            {t("portfolioCta")}
-          </LocalizedLink>
-        </div>
-      </section>
+    <main className="flex min-h-screen flex-col">
+      <HeroSection />
+      <AboutSection locale={activeLocale} />
+      <ServicesSection locale={activeLocale} />
+      <PortfolioPreview locale={activeLocale} />
+      <WhyChooseUsSection locale={activeLocale} />
+      <CertificationsSection locale={activeLocale} />
+      <ContactSection />
     </main>
   );
 }

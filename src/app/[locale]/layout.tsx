@@ -4,6 +4,8 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { routing } from "@/i18n/routing";
 import { APP_CONFIG, type AppLocale } from "@/lib/config/app-config";
 import { LocaleDirectionProvider } from "@/lib/contexts/locale-direction-context";
@@ -47,11 +49,14 @@ export default async function LocaleLayout({
 
   const messages = await getMessages({ locale });
   const direction = getLocaleDirection(locale);
+  const activeLocale = locale as AppLocale;
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <LocaleDirectionProvider locale={locale as AppLocale} direction={direction}>
+      <LocaleDirectionProvider locale={activeLocale} direction={direction}>
+        <Header />
         {children}
+        <Footer locale={activeLocale} />
       </LocaleDirectionProvider>
     </NextIntlClientProvider>
   );

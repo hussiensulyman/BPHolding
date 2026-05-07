@@ -6,7 +6,12 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { APP_CONFIG, type AppLocale } from "@/lib/config/app-config";
 import { useLocale } from "@/lib/hooks/use-locale";
 
-export function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  /** Render without the visible label above the select */
+  compact?: boolean;
+}
+
+export function LanguageSwitcher({ compact = false }: LanguageSwitcherProps) {
   const { locale, dir, t } = useLocale("languageSwitcher");
   const router = useRouter();
   const pathname = usePathname();
@@ -27,7 +32,7 @@ export function LanguageSwitcher() {
 
   return (
     <label className="text-flow-start flex flex-col gap-2 text-sm font-semibold text-primary">
-      <span>{t("label")}</span>
+      {!compact && <span>{t("label")}</span>}
       <div className="relative inline-flex">
         <span
           aria-hidden="true"
