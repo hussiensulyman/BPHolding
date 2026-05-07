@@ -17,12 +17,11 @@ function extractAdminSection(pathname: string): {
   isLoginRoute: boolean;
 } {
   const segments = pathname.split("/").filter(Boolean);
-  const locale = segments[0] ?? routing.defaultLocale;
-  const normalizedSegments =
+  const hasLocalePrefix =
     segments[0] &&
-    routing.locales.includes(segments[0] as (typeof routing.locales)[number])
-      ? segments.slice(1)
-      : segments;
+    routing.locales.includes(segments[0] as (typeof routing.locales)[number]);
+  const locale = hasLocalePrefix ? segments[0]! : routing.defaultLocale;
+  const normalizedSegments = hasLocalePrefix ? segments.slice(1) : segments;
 
   const isAdminRoute = normalizedSegments[0] === "admin";
   const section = normalizedSegments[1] ?? "dashboard";
@@ -38,6 +37,20 @@ function extractAdminSection(pathname: string): {
 export default async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const route = extractAdminSection(pathname);
+
+  if (route.isAdminRoute && route.isLoginRoute) {
+    const token = await getToken({
+      req: request,
+      secret: AUTH_SECRET,
+    });
+    const role = token?.role;
+
+    if (typeof role === "string" && isAdminRole(role as Role)) {
+      return NextResponse.redirect(new URL(`/${route.locale}/admin`, request.url));
+    }
+
+    return intlMiddleware(request);
+  }
 
   if (route.isAdminRoute && !route.isLoginRoute) {
     const token = await getToken({
