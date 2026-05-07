@@ -121,9 +121,9 @@ export function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — hidden on short mobile viewports to avoid overlap with stats */}
       <motion.div
-        className="absolute bottom-24 inset-x-0 z-10 flex flex-col items-center gap-1"
+        className="absolute bottom-8 inset-x-0 z-10 hidden flex-col items-center gap-1 sm:flex sm:bottom-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}

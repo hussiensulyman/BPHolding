@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 
 import { LocalizedLink } from "@/components/layout/LocalizedLink";
 import { FilterBar } from "@/components/portfolio/FilterBar";
@@ -116,10 +117,14 @@ export default async function PortfolioPage({
       {/* Content */}
       <div className="bg-[var(--color-background)] flex flex-col gap-8 pt-10 pb-16">
         <div className="section-container">
-          <FilterBar locale={activeLocale} availableYears={projects.availableYears} />
+          <Suspense
+            fallback={<div className="h-40 animate-pulse rounded-2xl bg-slate-200" />}
+          >
+            <FilterBar locale={activeLocale} availableYears={projects.availableYears} />
+          </Suspense>
         </div>
 
-        <div className="section-container">
+        <div id="projects-grid" className="section-container">
           <PortfolioGrid items={projects.items} locale={activeLocale} />
         </div>
 

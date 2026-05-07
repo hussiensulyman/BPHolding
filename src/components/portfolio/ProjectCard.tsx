@@ -53,17 +53,25 @@ export function ProjectCard({
       data-testid={APP_CONFIG.testIds.portfolioProjectItem}
     >
       <div className="relative h-[280px] w-full overflow-hidden bg-slate-100 md:h-[320px]">
-        <IKImage
-          urlEndpoint={IMAGEKIT_PUBLIC_URL}
-          src={project.coverImagePath}
-          alt={localizedDescription}
-          width={800}
-          height={560}
-          loading={prioritizeImage ? undefined : "lazy"}
-          fetchPriority={prioritizeImage ? "high" : "auto"}
-          transformation={[{ width: 800, quality: 85, format: "webp" }]}
-          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-        />
+        {project.coverImagePath ? (
+          <IKImage
+            urlEndpoint={IMAGEKIT_PUBLIC_URL}
+            src={project.coverImagePath}
+            alt={localizedDescription}
+            width={800}
+            height={560}
+            loading={prioritizeImage ? undefined : "lazy"}
+            fetchPriority={prioritizeImage ? "high" : "auto"}
+            transformation={[{ width: 800, quality: 85, format: "webp" }]}
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 via-primary/10 to-transparent">
+            <span className="select-none text-5xl font-extrabold text-primary/20">
+              BP
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4 px-5 py-5 text-start">
@@ -96,7 +104,9 @@ export function ProjectCard({
       {/* Hover overlay with a real clickable link */}
       <div
         className={`absolute inset-0 flex items-center justify-center bg-primary/55 transition-opacity duration-200 ${
-          showCta ? "opacity-100" : "opacity-0 group-focus-within:opacity-100"
+          showCta
+            ? "opacity-100"
+            : "pointer-events-none opacity-0 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
         }`}
       >
         <LocalizedLink
