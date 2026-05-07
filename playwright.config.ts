@@ -31,7 +31,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run build && npm run start",
+    command: "rm -f .tmp/in-memory-projects.json && npm run build && npm run start",
     url: `${baseURL}/ar`,
     timeout: 600000,
     reuseExistingServer: false,

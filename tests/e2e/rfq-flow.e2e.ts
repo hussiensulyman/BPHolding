@@ -51,7 +51,17 @@ test("EN RFQ flow submits and appears in mock admin dashboard", async ({ page })
 
   await page.getByRole("link", { name: "Open Admin Dashboard (Mock)" }).click();
 
-  await expect(page).toHaveURL(/\/en\/admin\/rfq\?mockRef=/);
+  await page.waitForURL(/\/en\/admin\/(login|rfq)/, {
+    timeout: 15000,
+  });
+
+  if (page.url().includes("/en/admin/login")) {
+    await page.getByLabel("Email").fill("admin@bpholding.net");
+    await page.getByLabel("Password").fill("Admin@12345");
+    await page.getByRole("button", { name: "Sign in" }).click();
+  }
+
+  await expect(page).toHaveURL(/\/en\/admin\/rfq\?mockRef=/, { timeout: 15000 });
   await expect(page.getByTestId("mock-admin-reference")).toHaveText(reference);
 });
 
