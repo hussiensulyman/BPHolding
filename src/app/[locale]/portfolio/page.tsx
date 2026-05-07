@@ -1,14 +1,48 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
 import { LocalizedLink } from "@/components/layout/LocalizedLink";
 import { FilterBar } from "@/components/portfolio/FilterBar";
 import { PortfolioGrid } from "@/components/portfolio/PortfolioGrid";
-import type { AppLocale } from "@/lib/config/app-config";
+import { APP_CONFIG, type AppLocale } from "@/lib/config/app-config";
 import {
   createPortfolioService,
   type PortfolioListFilters,
 } from "@/lib/data/portfolio-service";
+import { getLocalizedAlternates, getLocalizedSeo } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const activeLocale = (
+    APP_CONFIG.locales.includes(locale as never) ? locale : APP_CONFIG.defaultLocale
+  ) as import("@/lib/config/app-config").AppLocale;
+  const seo = getLocalizedSeo(activeLocale);
+
+  const title =
+    activeLocale === "ar"
+      ? `استوديو المشاريع | ${seo.title}`
+      : `Portfolio Studio | ${seo.title}`;
+  const description =
+    activeLocale === "ar"
+      ? "تصفح مشاريع بي بي القابضة مع فلاتر ذكية حسب الفئة والمدينة والسنة."
+      : "Browse BP Holding projects with smart filters by category, city, year, and search.";
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates(activeLocale, "/portfolio"),
+    openGraph: {
+      title,
+      description,
+      type: "website",
+    },
+  };
+}
 
 export const revalidate = 0;
 

@@ -1,8 +1,42 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { RFQForm } from "@/components/forms/RFQForm";
 import { LocalizedLink } from "@/components/layout/LocalizedLink";
-import type { AppLocale } from "@/lib/config/app-config";
+import { APP_CONFIG, type AppLocale } from "@/lib/config/app-config";
+import { getLocalizedAlternates, getLocalizedSeo } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const activeLocale = (
+    APP_CONFIG.locales.includes(locale as never) ? locale : APP_CONFIG.defaultLocale
+  ) as import("@/lib/config/app-config").AppLocale;
+  const seo = getLocalizedSeo(activeLocale);
+
+  const title =
+    activeLocale === "ar"
+      ? `طلب عرض سعر | ${seo.title}`
+      : `Request a Quote | ${seo.title}`;
+  const description =
+    activeLocale === "ar"
+      ? "أرسل تفاصيل مشروعك وسيتواصل معك فريق بي بي القابضة بعرض سعر مخصص."
+      : "Submit your project details and BP Holding will contact you with a tailored proposal.";
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates(activeLocale, "/rfq"),
+    openGraph: {
+      title,
+      description,
+      type: "website",
+    },
+  };
+}
 
 type SearchParamValue = string | string[] | undefined;
 
