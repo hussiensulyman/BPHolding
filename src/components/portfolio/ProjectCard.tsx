@@ -45,7 +45,7 @@ export function ProjectCard({
 
   return (
     <article
-      className="group surface-card relative overflow-hidden"
+      className="group surface-card relative flex min-h-[400px] flex-col overflow-hidden cursor-pointer"
       dir={locale === "ar" ? "rtl" : "ltr"}
       onMouseEnter={() => setShowCta(true)}
       onMouseLeave={() => setShowCta(false)}
@@ -86,22 +86,27 @@ export function ProjectCard({
 
         <LocalizedLink
           href={`/portfolio/${project.slug}`}
-          className="inline-flex items-center rounded-full border border-primary/30 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="relative z-10 inline-flex cursor-pointer items-center rounded-full border border-primary/30 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           aria-label={ctaText}
         >
           {ctaText}
         </LocalizedLink>
       </div>
 
+      {/* Hover overlay with a real clickable link */}
       <div
-        className={`pointer-events-none absolute inset-0 flex items-center justify-center bg-primary/55 transition-opacity duration-200 ${
+        className={`absolute inset-0 flex items-center justify-center bg-primary/55 transition-opacity duration-200 ${
           showCta ? "opacity-100" : "opacity-0 group-focus-within:opacity-100"
         }`}
-        aria-hidden="true"
       >
-        <span className="rounded-full bg-white px-5 py-2 text-sm font-bold text-primary">
+        <LocalizedLink
+          href={`/portfolio/${project.slug}`}
+          className="z-20 cursor-pointer rounded-full bg-white px-5 py-2 text-sm font-bold text-primary shadow-md transition hover:bg-[var(--color-secondary)] hover:text-white"
+          tabIndex={showCta ? 0 : -1}
+          aria-hidden={!showCta}
+        >
           {ctaText}
-        </span>
+        </LocalizedLink>
       </div>
     </article>
   );

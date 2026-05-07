@@ -188,19 +188,22 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
   }
 
   return (
-    <section className="grid gap-5">
+    <section className="grid gap-6">
+      {/* Form */}
       <form
         onSubmit={submitForm}
-        className="grid gap-3 rounded-xl border border-primary/15 bg-white p-4"
+        className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100"
       >
-        <h2 className="text-lg font-bold text-primary">{text.sectionTitle}</h2>
+        <h2 className="mb-5 text-lg font-extrabold text-[#052a42]">
+          {text.sectionTitle}
+        </h2>
 
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <input
             value={form.slug}
             onChange={(event) => updateForm("slug", event.target.value)}
             placeholder="slug"
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             required
           />
           <input
@@ -209,7 +212,7 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
               updateForm("category", event.target.value as ProjectCategory)
             }
             placeholder="Category"
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             list="project-categories"
             required
           />
@@ -217,21 +220,21 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
             value={form.titleEn}
             onChange={(event) => updateForm("titleEn", event.target.value)}
             placeholder="Title (EN)"
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             required
           />
           <input
             value={form.titleAr}
             onChange={(event) => updateForm("titleAr", event.target.value)}
             placeholder="Title (AR)"
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             required
           />
           <textarea
             value={form.descriptionEn}
             onChange={(event) => updateForm("descriptionEn", event.target.value)}
             placeholder="Description (EN)"
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             rows={3}
             required
           />
@@ -239,7 +242,7 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
             value={form.descriptionAr}
             onChange={(event) => updateForm("descriptionAr", event.target.value)}
             placeholder="Description (AR)"
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             rows={3}
             required
           />
@@ -247,21 +250,21 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
             value={form.location}
             onChange={(event) => updateForm("location", event.target.value)}
             placeholder={locale === "ar" ? "الموقع" : "Location"}
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             required
           />
           <input
             value={form.city}
             onChange={(event) => updateForm("city", event.target.value)}
             placeholder={locale === "ar" ? "المدينة" : "City"}
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             required
           />
           <input
             value={form.year}
             onChange={(event) => updateForm("year", event.target.value)}
             placeholder={locale === "ar" ? "السنة" : "Year"}
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             inputMode="numeric"
           />
           <select
@@ -270,7 +273,7 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
             onChange={(event) =>
               updateForm("status", event.target.value as ProjectStatus)
             }
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
           >
             <option value="DRAFT">DRAFT</option>
             <option value="PUBLISHED">PUBLISHED</option>
@@ -278,37 +281,38 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
           </select>
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-primary">
+        <label className="mt-4 flex items-center gap-2 text-sm font-medium text-[#052a42]">
           <input
             type="checkbox"
+            className="accent-[#df9a13]"
             checked={form.featured}
             onChange={(event) => updateForm("featured", event.target.checked)}
           />
           {locale === "ar" ? "مشروع مميز" : "Featured project"}
         </label>
 
-        <label className="grid gap-1 text-sm font-semibold text-primary">
+        <label className="mt-4 grid gap-1.5 text-sm font-semibold text-[#052a42]">
           <span>{text.imageKitLabel}</span>
           <textarea
             value={form.imageUrls}
             onChange={(event) => updateForm("imageUrls", event.target.value)}
             placeholder="https://ik.imagekit.io/..."
-            className="rounded-lg border border-primary/20 px-3 py-2"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             rows={3}
           />
         </label>
 
-        <div className="flex items-center gap-2">
+        <div className="mt-5 flex items-center gap-3">
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
+            className="rounded-xl bg-[#052a42] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0a3a5c] disabled:opacity-60"
           >
             {isEditing ? text.update : text.create}
           </button>
           <button
             type="button"
-            className="rounded-lg border border-primary/25 px-4 py-2 text-sm font-semibold text-primary"
+            className="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
             onClick={() => setForm(EMPTY_FORM)}
           >
             {text.reset}

@@ -22,16 +22,20 @@ export async function AdminLayout({ locale, children }: AdminLayoutProps) {
 
   return (
     <AdminNotificationsProvider locale={locale}>
-      <main className="inline-pad mx-inline-auto min-h-screen w-full max-w-[1600px] py-4">
-        <div className="grid gap-4 lg:grid-cols-[auto,1fr]">
-          <SidebarNav locale={locale} role={user.role} />
-          <section className="grid content-start gap-4">
-            <TopBar locale={locale} userName={user.name} userRole={user.role} />
+      <div className="flex min-h-screen bg-slate-50">
+        {/* Sidebar */}
+        <SidebarNav locale={locale} role={user.role} />
+
+        {/* Main area */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <TopBar locale={locale} userName={user.name} userRole={user.role} />
+
+          <main className="flex-1 p-6">
             <Breadcrumb locale={locale} />
-            <div className="surface-card min-h-[70vh] p-4">{children}</div>
-          </section>
+            <div className="mt-5">{children}</div>
+          </main>
         </div>
-      </main>
+      </div>
     </AdminNotificationsProvider>
   );
 }

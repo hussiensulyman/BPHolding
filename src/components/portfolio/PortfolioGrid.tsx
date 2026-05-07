@@ -63,11 +63,14 @@ export function PortfolioGrid({ items, locale }: PortfolioGridProps) {
 
   return (
     <section aria-label={locale === "ar" ? "شبكة المشاريع" : "Portfolio projects grid"}>
-      <div className="columns-1 gap-5 md:columns-2 xl:columns-3 [column-fill:_balance]">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         {visibleItems.map((project, index) => (
-          <div className="mb-5 break-inside-avoid" key={project.id}>
-            <ProjectCard project={project} locale={locale} prioritizeImage={index < 2} />
-          </div>
+          <ProjectCard
+            key={project.id}
+            project={project}
+            locale={locale}
+            prioritizeImage={index < 2}
+          />
         ))}
       </div>
 

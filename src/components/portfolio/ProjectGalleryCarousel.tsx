@@ -1,6 +1,7 @@
 "use client";
 
 import { Image as IKImage } from "@imagekit/next";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import type { AppLocale } from "@/lib/config/app-config";
@@ -80,24 +81,22 @@ export function ProjectGalleryCarousel({
           className="h-full w-full object-cover"
         />
 
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-3">
-          <button
-            type="button"
-            onClick={goPrevious}
-            aria-label={labels.previous}
-            className="pointer-events-auto rounded-full bg-white/95 px-3 py-2 text-lg font-bold text-primary shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            <span className="carousel-flip">◀</span>
-          </button>
-          <button
-            type="button"
-            onClick={goNext}
-            aria-label={labels.next}
-            className="pointer-events-auto rounded-full bg-white/95 px-3 py-2 text-lg font-bold text-primary shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            <span className="carousel-flip">▶</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={isRtl ? goNext : goPrevious}
+          aria-label={labels.previous}
+          className="absolute start-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+        >
+          <ChevronLeft size={22} className="text-[var(--color-primary)]" />
+        </button>
+        <button
+          type="button"
+          onClick={isRtl ? goPrevious : goNext}
+          aria-label={labels.next}
+          className="absolute end-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+        >
+          <ChevronRight size={22} className="text-[var(--color-primary)]" />
+        </button>
       </div>
 
       <div

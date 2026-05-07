@@ -9,6 +9,9 @@ import { WhyChooseUsSection } from "@/components/home/WhyChooseUsSection";
 import { CertificationsSection } from "@/components/home/CertificationsSection";
 import { ContactSection } from "@/components/home/ContactSection";
 
+// Force re-render on every navigation to prevent back-nav blank screen
+export const dynamic = "force-dynamic";
+
 function SectionFallback({ dark = false }: { dark?: boolean }) {
   return (
     <div
@@ -27,7 +30,7 @@ export default async function HomePage({
   const activeLocale = locale as AppLocale;
 
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="flex min-h-screen flex-col" key={activeLocale}>
       <HeroSection />
       <Suspense fallback={<SectionFallback />}>
         <AboutSection locale={activeLocale} />

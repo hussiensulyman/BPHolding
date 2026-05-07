@@ -118,20 +118,21 @@ export function ProjectsTable({
   }
 
   return (
-    <section className="grid gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-xl font-bold text-primary">{text.title}</h2>
+    <div className="grid gap-4">
+      {/* Table toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-xl font-extrabold text-[#052a42]">{text.title}</h2>
 
         <div className="flex items-center gap-2">
           <label
-            className="text-sm font-semibold text-primary"
+            className="text-sm font-medium text-slate-600"
             htmlFor="projects-bulk-action"
           >
             {text.bulk}
           </label>
           <select
             id="projects-bulk-action"
-            className="rounded-lg border border-primary/25 bg-white px-3 py-1 text-sm"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-[#df9a13] focus:outline-none focus:ring-2 focus:ring-[#df9a13]/30"
             value={bulkAction}
             onChange={(event) => setBulkAction(event.target.value as BulkAction)}
           >
@@ -142,7 +143,8 @@ export function ProjectsTable({
           </select>
           <button
             type="button"
-            className="rounded-lg bg-primary px-3 py-1 text-sm font-semibold text-white"
+            className="rounded-lg bg-[#052a42] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0a3a5c] disabled:opacity-50"
+            disabled={selectedIds.length === 0}
             onClick={() => void runBulkAction()}
           >
             {text.apply}
@@ -150,48 +152,65 @@ export function ProjectsTable({
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-primary/15 bg-white">
+      {/* Table */}
+      <div className="overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
         <table className="w-full min-w-[900px] text-sm">
-          <thead className="bg-slate-50 text-primary/80">
-            <tr>
-              <th className="px-3 py-2 text-start">
+          <thead>
+            <tr className="border-b border-slate-100 bg-slate-50">
+              <th className="px-4 py-3 text-start">
                 <input
                   aria-label={text.selectAll}
                   type="checkbox"
+                  className="accent-[#052a42]"
                   checked={items.length > 0 && selectedIds.length === items.length}
                   onChange={toggleAll}
                 />
               </th>
-              <th className="px-3 py-2 text-start">{text.titleHeader}</th>
-              <th className="px-3 py-2 text-start">{text.category}</th>
-              <th className="px-3 py-2 text-start">{text.city}</th>
-              <th className="px-3 py-2 text-start">{text.year}</th>
-              <th className="px-3 py-2 text-start">{text.status}</th>
-              <th className="px-3 py-2 text-start">{text.featured}</th>
-              <th className="px-3 py-2 text-start">{text.actions}</th>
+              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {text.titleHeader}
+              </th>
+              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {text.category}
+              </th>
+              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {text.city}
+              </th>
+              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {text.year}
+              </th>
+              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {text.status}
+              </th>
+              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {text.featured}
+              </th>
+              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {text.actions}
+              </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-100">
             {items.map((item) => (
-              <tr key={item.id} className="border-t border-primary/10">
-                <td className="px-3 py-2">
+              <tr key={item.id} className="transition hover:bg-[#df9a13]/5">
+                <td className="px-4 py-3">
                   <input
                     aria-label={`${text.selectAll}-${item.id}`}
                     type="checkbox"
+                    className="accent-[#052a42]"
                     checked={selectedSet.has(item.id)}
                     onChange={() => toggleSelect(item.id)}
                   />
                 </td>
-                <td className="px-3 py-2">
-                  <p className="font-semibold text-primary">
+                <td className="px-4 py-3">
+                  <p className="font-semibold text-[#052a42]">
                     {locale === "ar" ? item.titleAr : item.titleEn}
                   </p>
-                  <p className="text-xs text-slate-500">{item.slug}</p>
+                  <p className="text-xs text-slate-400">{item.slug}</p>
                 </td>
-                <td className="px-3 py-2">{item.category}</td>
-                <td className="px-3 py-2">{item.city}</td>
-                <td className="px-3 py-2">{item.year ?? "-"}</td>
-                <td className="px-3 py-2">
+                <td className="px-4 py-3 text-slate-600">{item.category}</td>
+                <td className="px-4 py-3 text-slate-600">{item.city}</td>
+                <td className="px-4 py-3 text-slate-600">{item.year ?? "—"}</td>
+                <td className="px-4 py-3">
                   <select
                     aria-label={`${text.status}-${item.id}`}
                     value={item.status}
@@ -200,17 +219,21 @@ export function ProjectsTable({
                         status: event.target.value as ProjectStatus,
                       })
                     }
-                    className="rounded-lg border border-primary/20 bg-white px-2 py-1"
+                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:border-[#df9a13] focus:outline-none"
                   >
                     <option value="DRAFT">DRAFT</option>
                     <option value="PUBLISHED">PUBLISHED</option>
                     <option value="ARCHIVED">ARCHIVED</option>
                   </select>
                 </td>
-                <td className="px-3 py-2">
+                <td className="px-4 py-3">
                   <button
                     type="button"
-                    className="rounded-lg border border-primary/20 px-2 py-1 text-xs font-semibold"
+                    className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                      item.featured
+                        ? "bg-[#df9a13]/15 text-[#a07010] hover:bg-[#df9a13]/25"
+                        : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    }`}
                     onClick={() =>
                       void onInlineUpdate(item.id, { featured: !item.featured })
                     }
@@ -218,10 +241,10 @@ export function ProjectsTable({
                     {item.featured ? text.featuredYes : text.featuredNo}
                   </button>
                 </td>
-                <td className="px-3 py-2">
+                <td className="px-4 py-3">
                   <button
                     type="button"
-                    className="rounded-lg border border-primary/20 px-2 py-1 text-xs font-semibold text-primary"
+                    className="rounded-lg border border-[#052a42]/20 px-3 py-1.5 text-xs font-semibold text-[#052a42] transition hover:bg-[#052a42] hover:text-white"
                     onClick={() => onEdit(item)}
                   >
                     {text.edit}
@@ -229,16 +252,16 @@ export function ProjectsTable({
                 </td>
               </tr>
             ))}
-            {!loading && items.length === 0 ? (
+            {!loading && items.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={8} className="px-4 py-12 text-center text-slate-400">
                   No projects found.
                 </td>
               </tr>
-            ) : null}
+            )}
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   );
 }
