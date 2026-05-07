@@ -71,7 +71,11 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  return intlMiddleware(request);
+  const response = intlMiddleware(request);
+  // Signal to the locale layout whether this is an admin route so it can
+  // suppress the public Header and Footer.
+  response.headers.set("x-is-admin", route.isAdminRoute ? "1" : "0");
+  return response;
 }
 
 export const config = {

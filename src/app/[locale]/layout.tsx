@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -51,12 +52,15 @@ export default async function LocaleLayout({
   const direction = getLocaleDirection(locale);
   const activeLocale = locale as AppLocale;
 
+  const headersList = await headers();
+  const isAdmin = headersList.get("x-is-admin") === "1";
+
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <LocaleDirectionProvider locale={activeLocale} direction={direction}>
-        <Header />
+        {!isAdmin && <Header />}
         {children}
-        <Footer locale={activeLocale} />
+        {!isAdmin && <Footer locale={activeLocale} />}
       </LocaleDirectionProvider>
     </NextIntlClientProvider>
   );

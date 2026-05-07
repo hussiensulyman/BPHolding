@@ -75,9 +75,13 @@ export function SidebarNav({ locale, role }: SidebarNavProps) {
         <div className="grid gap-0.5">
           {navItems.map((item) => {
             const localizedHref = `/${locale}${item.href}`;
+            // next-intl usePathname() returns WITHOUT locale prefix; compare both
             const isActive =
+              pathname === item.href ||
               pathname === localizedHref ||
-              (item.href !== "/admin" && pathname.startsWith(`${localizedHref}/`));
+              (item.href !== "/admin" &&
+                (pathname.startsWith(`${item.href}/`) ||
+                  pathname.startsWith(`${localizedHref}/`)));
 
             return (
               <LocalizedLink

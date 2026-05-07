@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type SubmissionType = "RFQ" | "JOB" | "CONTRACTOR";
@@ -17,6 +18,13 @@ type SubmissionItem = {
   contactedAt: string | null;
   internalNotes: string | null;
   payload: Record<string, unknown>;
+};
+
+const STATUS_BADGE: Record<SubmissionStatus, string> = {
+  NEW: "bg-emerald-100 text-emerald-700",
+  REVIEWED: "bg-blue-100 text-blue-700",
+  CONTACTED: "bg-amber-100 text-amber-700",
+  ARCHIVED: "bg-slate-100 text-slate-500",
 };
 
 const TABS: SubmissionType[] = ["RFQ", "JOB", "CONTRACTOR"];
@@ -241,7 +249,13 @@ export function SubmissionsInbox({ locale }: { locale: "ar" | "en" }) {
               <tr key={item.id} className="border-t border-primary/10">
                 <td className="px-3 py-2 font-semibold text-primary">{item.title}</td>
                 <td className="px-3 py-2">{item.email}</td>
-                <td className="px-3 py-2">{item.status}</td>
+                <td className="px-3 py-2">
+                  <span
+                    className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_BADGE[item.status]}`}
+                  >
+                    {item.status}
+                  </span>
+                </td>
                 <td className="px-3 py-2">
                   {new Date(item.submittedAt).toLocaleString()}
                 </td>
@@ -264,13 +278,40 @@ export function SubmissionsInbox({ locale }: { locale: "ar" | "en" }) {
       </div>
 
       {selected ? (
-        <div className="fixed inset-0 z-40 bg-black/30 p-4">
-          <div className="mx-auto mt-8 grid max-h-[80vh] w-full max-w-3xl gap-3 overflow-auto rounded-2xl border border-primary/20 bg-white p-4">
+        /* Backdrop – click outside to close */
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-8 backdrop-blur-sm"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="relative w-full max-w-3xl rounded-2xl border border-primary/20 bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-bold text-primary">{selected.title}</h3>
+                <p className="mt-0.5 text-sm text-slate-500">
+                  {selected.email} · {selected.phone}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                aria-label={copy.close}
+                className="cursor-pointer rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
             {(() => {
               const fileUrls = getPayloadFileUrls(selected.payload);
 
               return fileUrls.length > 0 ? (
-                <div className="rounded-lg border border-primary/10 bg-slate-50 p-3">
+                <div className="mb-4 rounded-lg border border-primary/10 bg-slate-50 p-3">
                   <p className="mb-2 text-xs font-semibold text-slate-700">
                     {locale === "ar" ? "الملفات المرفوعة" : "Uploaded files"}
                   </p>
@@ -281,7 +322,7 @@ export function SubmissionsInbox({ locale }: { locale: "ar" | "en" }) {
                         href={fileUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded-lg border border-primary/20 px-2 py-1 text-xs font-semibold text-primary"
+                        className="rounded-lg border border-primary/20 px-2 py-1 text-xs font-semibold text-primary hover:bg-primary/5"
                       >
                         {locale === "ar"
                           ? `فتح ملف ${index + 1}`
@@ -293,81 +334,81 @@ export function SubmissionsInbox({ locale }: { locale: "ar" | "en" }) {
               ) : null;
             })()}
 
-            <h3 className="text-lg font-bold text-primary">{selected.title}</h3>
-            <p className="text-sm text-slate-600">{selected.email}</p>
-            <p className="text-sm text-slate-600">{selected.phone}</p>
+            <div className="grid gap-4">
+              <label className="grid gap-1 text-sm font-semibold text-primary">
+                <span>Status</span>
+                <select
+                  value={selected.status}
+                  onChange={(event) => {
+                    const status = event.target.value as SubmissionStatus;
+                    setSelected((current) =>
+                      current ? { ...current, status } : current,
+                    );
+                  }}
+                  className="rounded-lg border border-primary/20 px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="NEW">NEW</option>
+                  <option value="REVIEWED">REVIEWED</option>
+                  <option value="CONTACTED">CONTACTED</option>
+                  <option value="ARCHIVED">ARCHIVED</option>
+                </select>
+              </label>
 
-            <label className="grid gap-1 text-sm font-semibold text-primary">
-              <span>Status</span>
-              <select
-                value={selected.status}
-                onChange={(event) => {
-                  const status = event.target.value as SubmissionStatus;
-                  setSelected((current) => (current ? { ...current, status } : current));
-                }}
-                className="rounded-lg border border-primary/20 px-3 py-2"
-              >
-                <option value="NEW">NEW</option>
-                <option value="REVIEWED">REVIEWED</option>
-                <option value="CONTACTED">CONTACTED</option>
-                <option value="ARCHIVED">ARCHIVED</option>
-              </select>
-            </label>
+              <label className="grid gap-1 text-sm font-semibold text-primary">
+                <span>{copy.notes}</span>
+                <textarea
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  className="rounded-lg border border-primary/20 px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  rows={4}
+                />
+              </label>
 
-            <label className="grid gap-1 text-sm font-semibold text-primary">
-              <span>{copy.notes}</span>
-              <textarea
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                className="rounded-lg border border-primary/20 px-3 py-2"
-                rows={4}
-              />
-            </label>
+              <div className="rounded-lg border border-primary/10 bg-slate-50 p-3">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {locale === "ar" ? "تفاصيل الطلب" : "Submission Data"}
+                </p>
+                <dl className="grid gap-1.5">
+                  {Object.entries(selected.payload).map(([key, value]) => (
+                    <div key={key} className="grid grid-cols-[160px_1fr] gap-2 text-xs">
+                      <dt className="font-semibold text-slate-600 break-words">{key}</dt>
+                      <dd className="text-slate-800 break-words">
+                        {value === null || value === undefined
+                          ? "—"
+                          : typeof value === "object"
+                            ? JSON.stringify(value)
+                            : String(value)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
 
-            <div className="rounded-lg border border-primary/10 bg-slate-50 p-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {locale === "ar" ? "تفاصيل الطلب" : "Submission Data"}
-              </p>
-              <dl className="grid gap-1.5">
-                {Object.entries(selected.payload).map(([key, value]) => (
-                  <div key={key} className="grid grid-cols-[160px_1fr] gap-2 text-xs">
-                    <dt className="font-semibold text-slate-600 break-words">{key}</dt>
-                    <dd className="text-slate-800 break-words">
-                      {value === null || value === undefined
-                        ? "—"
-                        : typeof value === "object"
-                          ? JSON.stringify(value)
-                          : String(value)}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={saving}
-                onClick={() => void updateSubmission(selected.status)}
-                className="cursor-pointer rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {copy.save}
-              </button>
-              <button
-                type="button"
-                disabled={saving}
-                onClick={() => void markContacted()}
-                className="cursor-pointer rounded-lg border border-primary/20 px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {copy.markContacted}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelected(null)}
-                className="cursor-pointer rounded-lg border border-primary/20 px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-slate-100"
-              >
-                {copy.close}
-              </button>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void updateSubmission(selected.status)}
+                  className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {copy.save}
+                </button>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void markContacted()}
+                  className="cursor-pointer rounded-lg border border-primary/20 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {copy.markContacted}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelected(null)}
+                  className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100"
+                >
+                  {copy.close}
+                </button>
+              </div>
             </div>
           </div>
         </div>

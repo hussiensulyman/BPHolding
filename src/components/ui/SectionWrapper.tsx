@@ -28,7 +28,11 @@ export function SectionWrapper({
   useLayoutEffect(() => {
     if (!ref.current) return;
     const { top, bottom } = ref.current.getBoundingClientRect();
-    if (top < window.innerHeight && bottom > 0) {
+    // Skip animation if section is in viewport OR already above viewport
+    // (covers back-navigation with scroll-position restoration)
+    const inViewport = top < window.innerHeight && bottom > 0;
+    const aboveViewport = bottom <= 0;
+    if (inViewport || aboveViewport) {
       setSkipAnimation(true);
     }
   }, []);
