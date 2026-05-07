@@ -76,7 +76,13 @@ describe("critical paths", () => {
         total: projects.length,
       }),
       listRelatedByCategory: async () => [],
+      listAdmin: async () => ({
+        items: [...projects],
+        total: projects.length,
+      }),
       create: async () => projects[0]!,
+      update: async () => projects[0]!,
+      delete: async () => true,
     };
 
     const service = new PortfolioService(repository);

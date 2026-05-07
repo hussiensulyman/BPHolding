@@ -4,16 +4,21 @@ import type {
   RFQSubmissionRecord,
 } from "@/lib/repositories/contracts/rfq-repository";
 
-type StoredRFQSubmission = RFQSubmissionRecord & {
+export type StoredRFQSubmission = RFQSubmissionRecord & {
   year: number;
   payload: CreateRFQSubmissionInput;
 };
 
-export class InMemoryRFQRepository implements IRFQRepository {
-  private submissions: StoredRFQSubmission[] = [];
+const inMemoryRfqSubmissionsStore: StoredRFQSubmission[] = [];
 
+export function getInMemoryRfqSubmissions(): StoredRFQSubmission[] {
+  return [...inMemoryRfqSubmissionsStore];
+}
+
+export class InMemoryRFQRepository implements IRFQRepository {
   async countByYear(year: number): Promise<number> {
-    return this.submissions.filter((submission) => submission.year === year).length;
+    return inMemoryRfqSubmissionsStore.filter((submission) => submission.year === year)
+      .length;
   }
 
   async create(input: CreateRFQSubmissionInput): Promise<RFQSubmissionRecord> {
@@ -26,7 +31,7 @@ export class InMemoryRFQRepository implements IRFQRepository {
       payload: input,
     };
 
-    this.submissions.unshift(created);
+    inMemoryRfqSubmissionsStore.unshift(created);
 
     return {
       id: created.id,

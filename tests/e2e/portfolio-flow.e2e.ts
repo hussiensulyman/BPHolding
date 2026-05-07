@@ -42,8 +42,11 @@ test("portfolio flow supports filtering, detail navigation, RFQ prefill, and Ara
   await page.waitForURL(/\/en\/rfq\?category=RESIDENTIAL$/, { timeout: 15_000 });
 
   await expect(page).toHaveURL(/\/en\/rfq\?category=RESIDENTIAL$/);
-  await expect(page.getByRole("textbox", { name: "Project Category" })).toHaveValue(
-    "RESIDENTIAL",
+  await expect(
+    page.getByText("Project category was prefilled from the selected portfolio project."),
+  ).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Project Type" })).toHaveValue(
+    "Residential",
   );
 
   await page.goto("/ar/portfolio");

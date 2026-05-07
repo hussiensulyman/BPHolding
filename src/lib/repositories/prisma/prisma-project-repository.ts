@@ -3,10 +3,13 @@ import type { PrismaClient } from "@prisma/client";
 import type {
   CreateProjectInput,
   IProjectRepository,
+  ListAdminProjectsInput,
+  ListAdminProjectsResult,
   ListPublishedProjectsInput,
   ListPublishedProjectsResult,
   ProjectCategoryValue,
   ProjectRecord,
+  UpdateProjectInput,
 } from "@/lib/repositories/contracts/project-repository";
 import { prisma } from "@/lib/db";
 
@@ -15,6 +18,8 @@ type ProjectDelegate = {
   findMany(args: unknown): Promise<ProjectRecord[]>;
   count(args: unknown): Promise<number>;
   create(args: unknown): Promise<ProjectRecord>;
+  update(args: unknown): Promise<ProjectRecord>;
+  delete(args: unknown): Promise<ProjectRecord>;
 };
 
 type ProjectPrismaClient = Pick<PrismaClient, never> & {
@@ -111,6 +116,44 @@ export class PrismaProjectRepository implements IProjectRepository {
     });
   }
 
+  async listAdmin(input: ListAdminProjectsInput = {}): Promise<ListAdminProjectsResult> {
+    const page = Math.max(1, input.page ?? 1);
+    const pageSize = Math.max(1, input.pageSize ?? 20);
+    const searchValue = input.search?.trim();
+
+    const where = {
+      ...(input.status ? { status: input.status } : {}),
+      ...(input.category ? { category: input.category } : {}),
+      ...(searchValue
+        ? {
+            OR: [
+              { titleEn: { contains: searchValue, mode: "insensitive" } },
+              { titleAr: { contains: searchValue, mode: "insensitive" } },
+              { descriptionEn: { contains: searchValue, mode: "insensitive" } },
+              { descriptionAr: { contains: searchValue, mode: "insensitive" } },
+              { slug: { contains: searchValue, mode: "insensitive" } },
+              { city: { contains: searchValue, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    };
+
+    const [items, total] = await Promise.all([
+      this.prismaClient.project.findMany({
+        where,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+      }),
+      this.prismaClient.project.count({ where }),
+    ]);
+
+    return {
+      items,
+      total,
+    };
+  }
+
   create(input: CreateProjectInput): Promise<ProjectRecord> {
     return this.prismaClient.project.create({
       data: {
@@ -121,6 +164,7 @@ export class PrismaProjectRepository implements IProjectRepository {
         descriptionAr: input.descriptionAr,
         location: input.location,
         city: input.city,
+        year: input.year,
         category: input.category,
         status: input.status,
         featured: input.featured,
@@ -129,5 +173,38 @@ export class PrismaProjectRepository implements IProjectRepository {
         ownerId: input.ownerId,
       },
     });
+  }
+
+  update(id: string, input: UpdateProjectInput): Promise<ProjectRecord | null> {
+    return this.prismaClient.project
+      .update({
+        where: { id },
+        data: {
+          slug: input.slug,
+          titleEn: input.titleEn,
+          titleAr: input.titleAr,
+          descriptionEn: input.descriptionEn,
+          descriptionAr: input.descriptionAr,
+          location: input.location,
+          city: input.city,
+          year: input.year,
+          category: input.category,
+          status: input.status,
+          featured: input.featured,
+          completedAt: input.completedAt,
+          sortOrder: input.sortOrder,
+          ownerId: input.ownerId,
+        },
+      })
+      .catch(() => null);
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const deleted = await this.prismaClient.project
+      .delete({ where: { id } })
+      .then(() => true)
+      .catch(() => false);
+
+    return deleted;
   }
 }

@@ -1,4 +1,5 @@
 import { PrismaClient, Role } from "@prisma/client";
+import { hashSync } from "bcryptjs";
 import { fileURLToPath } from "node:url";
 
 const prisma = new PrismaClient();
@@ -44,6 +45,8 @@ type SeedClient = {
 };
 
 export const ADMIN_EMAIL = "admin@bpholding.net";
+export const ADMIN_PASSWORD = "Admin@12345";
+const ADMIN_PASSWORD_HASH = hashSync(ADMIN_PASSWORD, 10);
 
 export const CORE_SERVICES = {
   en: [
@@ -191,13 +194,14 @@ export async function seedBpHoldingContent(client: SeedClient): Promise<void> {
     where: { email: ADMIN_EMAIL },
     update: {
       name: "BP Holding Admin",
+      passwordHash: ADMIN_PASSWORD_HASH,
       role: Role.ADMIN,
       isActive: true,
     },
     create: {
       email: ADMIN_EMAIL,
       name: "BP Holding Admin",
-      passwordHash: "CHANGE_ME_WITH_SECURE_HASH",
+      passwordHash: ADMIN_PASSWORD_HASH,
       role: Role.ADMIN,
       isActive: true,
     },
@@ -236,6 +240,7 @@ export async function seedBpHoldingContent(client: SeedClient): Promise<void> {
         descriptionAr: project.descriptionAr,
         location: project.location,
         city: project.city,
+        year: (project.completedAt ?? new Date()).getUTCFullYear(),
         category: project.category,
         status: project.status,
         featured: project.featured,
@@ -251,6 +256,7 @@ export async function seedBpHoldingContent(client: SeedClient): Promise<void> {
         descriptionAr: project.descriptionAr,
         location: project.location,
         city: project.city,
+        year: (project.completedAt ?? new Date()).getUTCFullYear(),
         category: project.category,
         status: project.status,
         featured: project.featured,
@@ -263,10 +269,11 @@ export async function seedBpHoldingContent(client: SeedClient): Promise<void> {
 
   await client.auditLog.create({
     data: {
-      actorId: adminUser.id,
+      adminId: adminUser.id,
       action: "SEED_BP_HOLDING_CONTENT",
       entityType: "SYSTEM",
       entityId: "bootstrap",
+      timestamp: new Date(),
       metadata: {
         projectsSeeded: PREVIOUS_PROJECTS.length,
         servicesSeeded: CORE_SERVICES.en.length,

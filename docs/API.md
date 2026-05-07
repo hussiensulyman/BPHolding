@@ -12,6 +12,8 @@
 1. Authentication
 
 - `POST /api/auth/[...nextauth]` handled by Auth.js.
+- `GET /api/auth/session` returns authenticated session payload.
+- Credentials login at `/[locale]/admin/login`.
 
 1. RFQ
 
@@ -29,6 +31,28 @@
 - `PATCH /api/admin/projects/:id`
 - `DELETE /api/admin/projects/:id`
 
+1. Admin Submissions
+
+- `GET /api/admin/submissions`
+- `PATCH /api/admin/submissions/:type/:id`
+- `GET /api/admin/submissions/export`
+
+1. Admin Content
+
+- `GET /api/admin/content`
+- `PUT /api/admin/content`
+
+1. Admin Certifications
+
+- `GET /api/admin/certifications`
+- `POST /api/admin/certifications`
+- `PATCH /api/admin/certifications/:id`
+
+1. Admin Audit and Notifications
+
+- `GET /api/admin/audit`
+- `GET /api/admin/notifications`
+
 ## Common Response Envelope
 
 ```json
@@ -45,6 +69,83 @@
 - Validate MIME/type/size for uploads.
 - Enforce CSRF/session protections from Auth.js.
 - Audit log admin mutations.
+
+## Admin Authentication and RBAC
+
+- NextAuth v5 credentials provider with Prisma adapter.
+- JWT session strategy includes `user.role` for route authorization.
+- Session user shape:
+
+```json
+{
+  "user": {
+    "id": "user_id",
+    "email": "admin@bpholding.net",
+    "name": "BP Holding Admin",
+    "role": "ADMIN"
+  }
+}
+```
+
+- Protected routes:
+  - `/[locale]/admin/*` requires admin-authenticated session.
+  - `ADMIN` can access all admin sections.
+  - `HR` is allowed only on configured sections (`submissions`, `certifications`, `audit`, dashboard).
+
+## Admin CRUD Contracts
+
+### Projects
+
+- `GET /api/admin/projects`
+  - Query: `page`, `pageSize`, `status`, `category`, `search`
+- `POST /api/admin/projects`
+  - Body: `slug`, bilingual fields, `category`, `location`, `city`, `year`, `status`, `featured`, optional `imageUrls[]`
+- `PATCH /api/admin/projects/:id`
+  - Partial update for inline status and featured toggles or full edits.
+- `DELETE /api/admin/projects/:id`
+  - Removes project and logs audit action.
+
+### Submissions Inbox
+
+- `GET /api/admin/submissions`
+  - Query: `type` (`RFQ`, `JOB`, `CONTRACTOR`), `status`, `fromDate`, `toDate`
+- `PATCH /api/admin/submissions/:type/:id`
+  - Body: `status`, `internalNotes`, `markContacted`
+  - `markContacted=true` sets status to `CONTACTED` and persists timestamp.
+- `GET /api/admin/submissions/export`
+  - Exports filtered inbox rows as CSV.
+
+### Content Manager
+
+- `GET /api/admin/content`
+  - Returns editable homepage sections.
+- `PUT /api/admin/content`
+  - Body: `sectionKey`, `titleEn`, `titleAr`, `bodyEn`, `bodyAr`, `status` (`DRAFT`/`PUBLISHED`).
+
+### Certifications Manager
+
+- `GET /api/admin/certifications`
+  - Returns certifications with expiry metadata.
+- `POST /api/admin/certifications`
+  - Body: `title`, `titleAr`, `documentType`, `issueDate`, `expiryDate`, `fileUrl`, `showOnPublicGrid`.
+- `PATCH /api/admin/certifications/:id`
+  - Updates metadata and public visibility toggle.
+
+## Audit Log Schema
+
+Audit records are persisted in `audit_logs` with:
+
+- `admin_id`: nullable actor reference to users table.
+- `action`: event key (`PROJECT_CREATED`, `SUBMISSION_UPDATED`, etc.).
+- `entity_type`: logical domain (`PROJECT`, `RFQ`, `CONTENT`, `CERTIFICATION`).
+- `entity_id`: targeted record identifier.
+- `timestamp`: event creation timestamp.
+- `metadata`: JSON payload for extra context (changed fields, counts, statuses).
+
+Audit read endpoint:
+
+- `GET /api/admin/audit`
+  - Query filters: `adminId`, `action`, `fromDate`, `toDate`.
 
 ## RFQ Submit Endpoint
 

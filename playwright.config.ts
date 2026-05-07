@@ -6,6 +6,7 @@ export default defineConfig({
   testDir: "./tests/e2e",
   testMatch: "**/*.e2e.ts",
   fullyParallel: true,
+  workers: 1,
   retries: process.env.CI ? 2 : 0,
   reporter: [["html", { open: "never" }], ["list"]],
   use: {
@@ -35,6 +36,7 @@ export default defineConfig({
     timeout: 600000,
     reuseExistingServer: false,
     env: {
+      AUTH_SECRET: "bp-holding-dev-secret",
       RFQ_RATE_LIMIT_MAX: "20",
       RFQ_RATE_LIMIT_WINDOW_MS: "3600000",
     },

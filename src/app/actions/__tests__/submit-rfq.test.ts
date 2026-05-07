@@ -112,7 +112,7 @@ describe("submitRfqAction", () => {
       service.submit(invalidPayload, {
         ipAddress: "127.0.0.1",
       }),
-    ).rejects.toMatchObject<Partial<RFQSubmissionError>>({
+    ).rejects.toMatchObject({
       code: "VALIDATION",
       details: expect.objectContaining({
         "contact.phone": ["forms.rfq.contact.phone.error"],
@@ -148,7 +148,7 @@ describe("submitRfqAction", () => {
       service.submit(buildValidPayload(), {
         ipAddress: "10.0.0.1",
       }),
-    ).rejects.toMatchObject<Partial<RFQSubmissionError>>({
+    ).rejects.toMatchObject({
       code: "RATE_LIMIT",
     });
 

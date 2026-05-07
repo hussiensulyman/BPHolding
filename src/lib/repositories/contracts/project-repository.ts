@@ -17,6 +17,7 @@ export type ProjectRecord = {
   descriptionAr: string;
   location: string;
   city: string;
+  year?: number | null;
   category: ProjectCategoryValue;
   status: PublishStatusValue;
   featured: boolean;
@@ -41,6 +42,19 @@ export type ListPublishedProjectsResult = {
   total: number;
 };
 
+export type ListAdminProjectsInput = {
+  page?: number;
+  pageSize?: number;
+  status?: PublishStatusValue;
+  category?: ProjectCategoryValue;
+  search?: string;
+};
+
+export type ListAdminProjectsResult = {
+  items: ProjectRecord[];
+  total: number;
+};
+
 export type CreateProjectInput = {
   slug: string;
   titleEn: string;
@@ -49,6 +63,7 @@ export type CreateProjectInput = {
   descriptionAr: string;
   location: string;
   city: string;
+  year?: number;
   category: ProjectCategoryValue;
   status?: PublishStatusValue;
   featured?: boolean;
@@ -56,6 +71,12 @@ export type CreateProjectInput = {
   sortOrder?: number;
   ownerId?: string;
 };
+
+export type UpdateProjectInput = Partial<
+  Omit<CreateProjectInput, "slug"> & {
+    slug: string;
+  }
+>;
 
 export interface IProjectRepository {
   findById(id: string): Promise<ProjectRecord | null>;
@@ -69,7 +90,10 @@ export interface IProjectRepository {
     excludedSlug: string,
     limit?: number,
   ): Promise<ProjectRecord[]>;
+  listAdmin(input?: ListAdminProjectsInput): Promise<ListAdminProjectsResult>;
   create(input: CreateProjectInput): Promise<ProjectRecord>;
+  update(id: string, input: UpdateProjectInput): Promise<ProjectRecord | null>;
+  delete(id: string): Promise<boolean>;
 }
 
 export type ProjectRepository = IProjectRepository;

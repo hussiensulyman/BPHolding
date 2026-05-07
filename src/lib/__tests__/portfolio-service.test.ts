@@ -51,6 +51,10 @@ function createRepository(
       total: (seed.filtered ?? seed.source ?? []).length,
     })),
     listRelatedByCategory: vi.fn(async () => seed.related ?? []),
+    listAdmin: vi.fn(async () => ({
+      items: seed.filtered ?? seed.source ?? [],
+      total: (seed.filtered ?? seed.source ?? []).length,
+    })),
     create: vi.fn(async () =>
       createProjectRecord({
         id: "created",
@@ -59,6 +63,8 @@ function createRepository(
         status: "DRAFT",
       }),
     ),
+    update: vi.fn(async () => seed.findBySlug ?? seed.source?.[0] ?? null),
+    delete: vi.fn(async () => true),
   };
 }
 

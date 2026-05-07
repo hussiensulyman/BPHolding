@@ -1,11 +1,32 @@
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+
 import type {
   CreateProjectInput,
   IProjectRepository,
+  ListAdminProjectsInput,
+  ListAdminProjectsResult,
   ListPublishedProjectsInput,
   ListPublishedProjectsResult,
   ProjectCategoryValue,
   ProjectRecord,
+  UpdateProjectInput,
 } from "@/lib/repositories/contracts/project-repository";
+
+const IN_MEMORY_PROJECTS_FILE_PATH = join(
+  process.cwd(),
+  ".tmp",
+  "in-memory-projects.json",
+);
+
+type SerializedProjectRecord = Omit<
+  ProjectRecord,
+  "completedAt" | "createdAt" | "updatedAt"
+> & {
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
 
 const FALLBACK_PROJECTS: ProjectRecord[] = [
   {
@@ -185,19 +206,60 @@ function matchesSearch(project: ProjectRecord, search?: string): boolean {
   ].some((value) => value.toLowerCase().includes(normalized));
 }
 
+function serializeProject(project: ProjectRecord): SerializedProjectRecord {
+  return {
+    ...project,
+    completedAt: project.completedAt ? project.completedAt.toISOString() : null,
+    createdAt: project.createdAt.toISOString(),
+    updatedAt: project.updatedAt.toISOString(),
+  };
+}
+
+function deserializeProject(project: SerializedProjectRecord): ProjectRecord {
+  return {
+    ...project,
+    completedAt: project.completedAt ? new Date(project.completedAt) : null,
+    createdAt: new Date(project.createdAt),
+    updatedAt: new Date(project.updatedAt),
+  };
+}
+
 export class InMemoryProjectRepository implements IProjectRepository {
-  private projects: ProjectRecord[] = sortProjects(FALLBACK_PROJECTS);
+  private async loadProjects(): Promise<ProjectRecord[]> {
+    try {
+      const fileContent = await readFile(IN_MEMORY_PROJECTS_FILE_PATH, "utf-8");
+      const parsed = JSON.parse(fileContent) as SerializedProjectRecord[];
+
+      return sortProjects(parsed.map(deserializeProject));
+    } catch {
+      await this.saveProjects(FALLBACK_PROJECTS);
+
+      return sortProjects(FALLBACK_PROJECTS);
+    }
+  }
+
+  private async saveProjects(projects: ProjectRecord[]): Promise<void> {
+    await mkdir(dirname(IN_MEMORY_PROJECTS_FILE_PATH), { recursive: true });
+    await writeFile(
+      IN_MEMORY_PROJECTS_FILE_PATH,
+      JSON.stringify(projects.map(serializeProject), null, 2),
+      "utf-8",
+    );
+  }
 
   async findById(id: string): Promise<ProjectRecord | null> {
-    return this.projects.find((project) => project.id === id) ?? null;
+    const projects = await this.loadProjects();
+    return projects.find((project) => project.id === id) ?? null;
   }
 
   async findBySlug(slug: string): Promise<ProjectRecord | null> {
-    return this.projects.find((project) => project.slug === slug) ?? null;
+    const projects = await this.loadProjects();
+    return projects.find((project) => project.slug === slug) ?? null;
   }
 
   async listPublished(category?: ProjectCategoryValue): Promise<ProjectRecord[]> {
-    return this.projects.filter(
+    const projects = await this.loadProjects();
+    return projects.filter(
       (project) =>
         project.status === "PUBLISHED" && (!category || project.category === category),
     );
@@ -206,10 +268,11 @@ export class InMemoryProjectRepository implements IProjectRepository {
   async listPublishedFiltered(
     input: ListPublishedProjectsInput = {},
   ): Promise<ListPublishedProjectsResult> {
+    const projects = await this.loadProjects();
     const page = Math.max(1, input.page ?? 1);
     const pageSize = Math.max(1, input.pageSize ?? 12);
 
-    const filtered = this.projects.filter((project) => {
+    const filtered = projects.filter((project) => {
       if (project.status !== "PUBLISHED") {
         return false;
       }
@@ -243,8 +306,9 @@ export class InMemoryProjectRepository implements IProjectRepository {
     excludedSlug: string,
     limit = 3,
   ): Promise<ProjectRecord[]> {
+    const projects = await this.loadProjects();
     return sortProjects(
-      this.projects.filter(
+      projects.filter(
         (project) =>
           project.status === "PUBLISHED" &&
           project.category === category &&
@@ -253,7 +317,48 @@ export class InMemoryProjectRepository implements IProjectRepository {
     ).slice(0, limit);
   }
 
+  async listAdmin(input: ListAdminProjectsInput = {}): Promise<ListAdminProjectsResult> {
+    const projects = await this.loadProjects();
+    const page = Math.max(1, input.page ?? 1);
+    const pageSize = Math.max(1, input.pageSize ?? 20);
+    const search = input.search?.trim().toLowerCase();
+
+    const filtered = projects.filter((project) => {
+      if (input.status && project.status !== input.status) {
+        return false;
+      }
+
+      if (input.category && project.category !== input.category) {
+        return false;
+      }
+
+      if (!search) {
+        return true;
+      }
+
+      return [
+        project.slug,
+        project.titleEn,
+        project.titleAr,
+        project.descriptionEn,
+        project.descriptionAr,
+        project.location,
+        project.city,
+      ].some((value) => value.toLowerCase().includes(search));
+    });
+
+    const sorted = [...filtered].sort(
+      (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
+    );
+
+    return {
+      items: sorted.slice((page - 1) * pageSize, page * pageSize),
+      total: sorted.length,
+    };
+  }
+
   async create(input: CreateProjectInput): Promise<ProjectRecord> {
+    const projects = await this.loadProjects();
     const created: ProjectRecord = {
       id: `in-memory-${Date.now()}`,
       slug: input.slug,
@@ -263,6 +368,7 @@ export class InMemoryProjectRepository implements IProjectRepository {
       descriptionAr: input.descriptionAr,
       location: input.location,
       city: input.city,
+      year: input.year ?? (input.completedAt ? input.completedAt.getUTCFullYear() : null),
       category: input.category,
       status: input.status ?? "DRAFT",
       featured: input.featured ?? false,
@@ -273,8 +379,39 @@ export class InMemoryProjectRepository implements IProjectRepository {
       updatedAt: new Date(),
     };
 
-    this.projects = sortProjects([created, ...this.projects]);
+    await this.saveProjects(sortProjects([created, ...projects]));
 
     return created;
+  }
+
+  async update(id: string, input: UpdateProjectInput): Promise<ProjectRecord | null> {
+    const projects = await this.loadProjects();
+    const existing = projects.find((project) => project.id === id) ?? null;
+
+    if (!existing) {
+      return null;
+    }
+
+    const updated: ProjectRecord = {
+      ...existing,
+      ...input,
+      updatedAt: new Date(),
+    };
+
+    await this.saveProjects(
+      sortProjects(projects.map((project) => (project.id === id ? updated : project))),
+    );
+
+    return updated;
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const projects = await this.loadProjects();
+    const before = projects.length;
+    const nextProjects = projects.filter((project) => project.id !== id);
+
+    await this.saveProjects(nextProjects);
+
+    return before !== nextProjects.length;
   }
 }

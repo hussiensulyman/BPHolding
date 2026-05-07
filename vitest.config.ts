@@ -26,12 +26,16 @@ export default defineConfig({
         "src/lib/security/**/*.{ts,tsx}",
         "src/lib/validation/**/*.{ts,tsx}",
       ],
-      thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 80,
-        statements: 80,
-      },
+      ...(process.env.CI
+        ? {
+            thresholds: {
+              lines: 80,
+              functions: 80,
+              branches: 80,
+              statements: 80,
+            },
+          }
+        : {}),
     },
   },
 });

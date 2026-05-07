@@ -7,7 +7,7 @@ import { ProjectGalleryCarousel } from "@/components/portfolio/ProjectGalleryCar
 import type { AppLocale } from "@/lib/config/app-config";
 import { createPortfolioService } from "@/lib/data/portfolio-service";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export default async function PortfolioProjectDetailPage({
   params,

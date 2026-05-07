@@ -9,6 +9,8 @@ datasource db {
 
 enum Role {
   ADMIN
+  HR
+  SALES
   EMPLOYEE
   CONTRACTOR
   CLIENT
@@ -37,6 +39,20 @@ enum SubmissionStatus {
   ARCHIVED
 }
 
+enum ContentPublishStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum CertificationDocumentType {
+  GOSI
+  VAT
+  ZAKAT
+  TRADE_LICENSE
+  SAUDIZATION
+  SAFETY_CERTIFICATE
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -48,6 +64,9 @@ model User {
   updatedAt    DateTime @updatedAt
 
   profile                         Profile?
+  accounts                        Account[]
+  sessions                        Session[]
+  authenticators                  Authenticator[]
   projects                        Project[]                @relation("ProjectOwner")
   rfqSubmissionsReviewed          RFQSubmission[]          @relation("RFQReviewer")
   jobApplicationsReviewed         JobApplication[]         @relation("JobReviewer")
@@ -90,6 +109,7 @@ model Project {
   descriptionAr String
   location      String
   city          String
+  year          Int?
   category      ProjectCategory
   status        PublishStatus   @default(DRAFT)
   featured      Boolean         @default(false)
@@ -100,10 +120,26 @@ model Project {
   updatedAt     DateTime        @updatedAt
 
   owner User? @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  images ProjectImage[]
 
   @@index([category, status], map: "idx_projects_category_status")
   @@index([featured, status], map: "idx_projects_featured_status")
   @@map("projects")
+}
+
+model ProjectImage {
+  id        String   @id @default(cuid())
+  projectId String
+  imageUrl  String
+  altEn     String?
+  altAr     String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId], map: "idx_project_images_project_id")
+  @@map("project_images")
 }
 
 model RFQSubmission {
@@ -117,8 +153,10 @@ model RFQSubmission {
   estimatedBudget String?
   message         String
   status          SubmissionStatus @default(NEW)
+  internalNotes   String?
   submittedAt     DateTime         @default(now())
   reviewedAt      DateTime?
+  contactedAt     DateTime?
   handledById     String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -139,8 +177,10 @@ model JobApplication {
   coverLetterAr   String?
   resumeUrl       String?
   status          SubmissionStatus @default(NEW)
+  internalNotes   String?
   submittedAt     DateTime         @default(now())
   reviewedAt      DateTime?
+  contactedAt     DateTime?
   handledById     String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -162,8 +202,10 @@ model ContractorRegistration {
   servicesAr  String[]         @default([])
   notes       String?
   status      SubmissionStatus @default(NEW)
+  internalNotes String?
   submittedAt DateTime         @default(now())
   reviewedAt  DateTime?
+  contactedAt DateTime?
   handledById String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
@@ -180,11 +222,16 @@ model Certification {
   contractorRegistrationId  String?
   issuedById                String?
   title                     String
+  titleAr                   String?
+  documentType              CertificationDocumentType @default(SAFETY_CERTIFICATE)
   issuingAuthority          String
   certificateNumber         String?
   issuedAt                  DateTime
+  issueDate                 DateTime?
   expiresAt                 DateTime?
+  expiryDate                DateTime?
   certificateUrl            String?
+  showOnPublicGrid          Boolean  @default(true)
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
 
@@ -194,16 +241,92 @@ model Certification {
   @@map("certifications")
 }
 
+model ContentSection {
+  id         String               @id @default(cuid())
+  sectionKey String               @unique
+  titleEn    String
+  titleAr    String
+  bodyEn     String
+  bodyAr     String
+  status     ContentPublishStatus @default(DRAFT)
+  updatedBy  String?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  @@map("content_sections")
+}
+
 model AuditLog {
   id         String   @id @default(cuid())
-  actorId    String?
+  adminId    String?  @map("admin_id")
   action     String
-  entityType String
-  entityId   String
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  timestamp  DateTime @default(now())
   metadata   Json?
-  createdAt  DateTime @default(now())
 
-  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  admin User? @relation("AuditActor", fields: [adminId], references: [id], onDelete: SetNull)
 
+  @@index([adminId], map: "idx_audit_logs_admin_id")
+  @@index([action], map: "idx_audit_logs_action")
+  @@index([timestamp], map: "idx_audit_logs_timestamp")
   @@map("audit_logs")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId], map: "idx_accounts_user_id")
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_sessions_user_id")
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+  @@map("authenticators")
 }

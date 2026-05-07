@@ -9,7 +9,7 @@ import {
   type PortfolioListFilters,
 } from "@/lib/data/portfolio-service";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 function readSearchParam(
   searchParams: Record<string, string | string[] | undefined>,
