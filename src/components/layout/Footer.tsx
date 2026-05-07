@@ -88,12 +88,12 @@ export async function Footer({ locale }: FooterProps) {
             <h3 className="text-start mb-4 text-sm font-bold uppercase tracking-wider text-[var(--color-secondary)]">
               {t("quickLinks")}
             </h3>
-            <ul className="flex flex-col gap-2.5">
+            <ul className="flex flex-col gap-1">
               {QUICK_LINKS.map(({ href, labelKey }) => (
                 <li key={labelKey}>
                   <LocalizedLink
                     href={href}
-                    className="text-start block text-sm text-white/70 transition hover:text-[var(--color-secondary)]"
+                    className="flex min-h-[44px] items-center text-sm text-white/70 transition hover:text-[var(--color-secondary)]"
                   >
                     {tNav(labelKey)}
                   </LocalizedLink>

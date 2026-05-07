@@ -64,48 +64,87 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="surface-card mx-auto grid w-full max-w-md gap-4 px-6 py-7"
+      className="relative z-10 mx-auto w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-sm"
     >
-      <header className="space-y-2 text-start">
-        <h1 className="text-2xl font-bold text-primary">{text.title}</h1>
-        <p className="text-sm text-slate-600">{text.subtitle}</p>
-      </header>
+      {/* BP Logo */}
+      <div className="mb-6 flex flex-col items-center gap-3">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#df9a13] text-xl font-extrabold text-[#052a42] shadow-lg">
+          BP
+        </span>
+        <div className="text-center">
+          <h1 className="text-xl font-extrabold text-white">{text.title}</h1>
+          <p className="mt-0.5 text-sm text-white/60">{text.subtitle}</p>
+        </div>
+      </div>
 
-      <label className="grid gap-1 text-sm font-semibold text-primary">
+      <label className="mb-4 grid gap-1.5 text-sm font-semibold text-white/80">
         <span>{text.email}</span>
         <input
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="rounded-xl border border-primary/25 bg-white px-3 py-2 text-slate-800 outline-none ring-secondary/50 transition focus:ring-2"
+          className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-white placeholder-white/30 outline-none ring-[#df9a13]/60 transition focus:border-[#df9a13]/60 focus:ring-2"
           required
         />
       </label>
 
-      <label className="grid gap-1 text-sm font-semibold text-primary">
+      <label className="mb-4 grid gap-1.5 text-sm font-semibold text-white/80">
         <span>{text.password}</span>
         <input
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="rounded-xl border border-primary/25 bg-white px-3 py-2 text-slate-800 outline-none ring-secondary/50 transition focus:ring-2"
+          className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-white placeholder-white/30 outline-none ring-[#df9a13]/60 transition focus:border-[#df9a13]/60 focus:ring-2"
           required
         />
       </label>
 
+      <label className="mb-6 flex cursor-pointer items-center gap-2.5 text-sm text-white/70">
+        <input
+          type="checkbox"
+          className="h-4 w-4 rounded accent-[#df9a13] cursor-pointer"
+        />
+        {locale === "ar" ? "تذكرني" : "Remember me"}
+      </label>
+
       {error ? (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+        <p className="mb-4 rounded-lg bg-red-500/20 px-3 py-2 text-sm text-red-200">
+          {error}
+        </p>
       ) : null}
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="rounded-xl bg-primary px-4 py-2 font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-xl bg-[#df9a13] px-4 py-3 font-bold text-[#052a42] transition hover:bg-[#df9a13]/90 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? text.submitting : text.submit}
       </button>
 
-      <p className="text-xs text-slate-500">{text.hint}</p>
+      {/* Demo credentials */}
+      <div className="mt-6 rounded-xl border border-[#df9a13]/20 bg-[#df9a13]/10 p-4">
+        <p className="mb-2 text-xs font-bold uppercase tracking-widest text-[#df9a13]">
+          {locale === "ar" ? "حساب تجريبي" : "Demo Credentials"}
+        </p>
+        <div className="grid gap-1 text-xs text-white/70">
+          <div className="flex items-center gap-2">
+            <span className="w-20 font-semibold text-white/50">
+              {locale === "ar" ? "البريد" : "Email"}
+            </span>
+            <code className="rounded bg-white/10 px-1.5 py-0.5 text-white">
+              admin@bpholding.net
+            </code>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-20 font-semibold text-white/50">
+              {locale === "ar" ? "كلمة السر" : "Password"}
+            </span>
+            <code className="rounded bg-white/10 px-1.5 py-0.5 text-white">
+              Admin@12345
+            </code>
+          </div>
+        </div>
+      </div>
     </form>
   );
 }

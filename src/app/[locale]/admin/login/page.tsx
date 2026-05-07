@@ -60,7 +60,31 @@ export default async function AdminLoginPage({
   );
 
   return (
-    <main className="inline-pad mx-inline-auto flex min-h-screen w-full max-w-7xl items-center py-10">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#052a42] px-4 py-12">
+      {/* Geometric background elements */}
+      <div className="pointer-events-none absolute inset-0">
+        {/* Gold diagonal bar */}
+        <div className="absolute bottom-0 left-0 h-1 w-full bg-[#df9a13]/60" />
+        {/* Top-right gold glow */}
+        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-[#df9a13]/10" />
+        {/* Bottom-left navy pattern */}
+        <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-white/5" />
+        {/* Grid overlay */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.3) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        {/* Diagonal slash */}
+        <div
+          className="absolute inset-y-0 right-1/4 w-px bg-[#df9a13]/20"
+          style={{ transform: "skewX(-12deg)" }}
+        />
+      </div>
+
       <AdminLoginForm locale={activeLocale} callbackUrl={callbackUrl} />
     </main>
   );

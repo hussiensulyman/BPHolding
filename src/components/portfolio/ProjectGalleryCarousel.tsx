@@ -52,20 +52,12 @@ export function ProjectGalleryCarousel({
       onKeyDown={(event) => {
         if (event.key === "ArrowRight") {
           event.preventDefault();
-          if (isRtl) {
-            goPrevious();
-          } else {
-            goNext();
-          }
+          goNext();
         }
 
         if (event.key === "ArrowLeft") {
           event.preventDefault();
-          if (isRtl) {
-            goNext();
-          } else {
-            goPrevious();
-          }
+          goPrevious();
         }
       }}
     >
@@ -83,17 +75,17 @@ export function ProjectGalleryCarousel({
 
         <button
           type="button"
-          onClick={isRtl ? goNext : goPrevious}
+          onClick={goPrevious}
           aria-label={labels.previous}
-          className="absolute start-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+          className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
         >
           <ChevronLeft size={22} className="text-[var(--color-primary)]" />
         </button>
         <button
           type="button"
-          onClick={isRtl ? goPrevious : goNext}
+          onClick={goNext}
           aria-label={labels.next}
-          className="absolute end-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+          className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
         >
           <ChevronRight size={22} className="text-[var(--color-primary)]" />
         </button>

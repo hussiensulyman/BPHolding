@@ -1,6 +1,16 @@
 "use client";
 
 import type { Role } from "@prisma/client";
+import {
+  Award,
+  ClipboardList,
+  FileText,
+  FolderOpen,
+  Inbox,
+  LayoutDashboard,
+  LogOut,
+  type LucideIcon,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 
@@ -8,6 +18,15 @@ import { LocalizedLink } from "@/components/layout/LocalizedLink";
 import { usePathname } from "@/i18n/navigation";
 import { filterAdminNavByRole } from "@/components/admin/layout/admin-nav";
 import { useAdminNotifications } from "@/components/admin/layout/AdminNotificationsProvider";
+
+const NAV_ICONS: Record<string, LucideIcon> = {
+  dashboard: LayoutDashboard,
+  projects: FolderOpen,
+  submissions: Inbox,
+  content: FileText,
+  certifications: Award,
+  audit: ClipboardList,
+};
 
 type SidebarNavProps = {
   locale: "ar" | "en";
@@ -70,9 +89,12 @@ export function SidebarNav({ locale, role }: SidebarNavProps) {
                     : "border-s-4 border-transparent text-white/60 hover:bg-white/8 hover:text-white ps-2"
                 }`}
               >
-                <span aria-hidden="true" className="shrink-0 text-lg leading-none">
-                  {item.icon}
-                </span>
+                {(() => {
+                  const Icon = NAV_ICONS[item.key];
+                  return Icon ? (
+                    <Icon size={18} aria-hidden="true" className="shrink-0" />
+                  ) : null;
+                })()}
                 {!collapsed && <span className="truncate">{item.label}</span>}
                 {!collapsed && item.key === "submissions" && submissionBadgeCount > 0 && (
                   <span className="ms-auto inline-flex min-w-[20px] items-center justify-center rounded-full bg-[#df9a13] px-1.5 py-0.5 text-xs font-bold text-[#052a42]">
@@ -95,8 +117,8 @@ export function SidebarNav({ locale, role }: SidebarNavProps) {
           onClick={() => signOut({ callbackUrl: `/${locale}/admin/login` })}
           className={`flex min-h-[44px] w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-900/30 hover:text-red-300 ${collapsed ? "justify-center" : ""}`}
         >
-          <span aria-hidden="true" className="shrink-0 text-lg leading-none">
-            ⎋
+          <span aria-hidden="true" className="shrink-0">
+            <LogOut size={18} />
           </span>
           {!collapsed && <span>{locale === "ar" ? "تسجيل الخروج" : "Logout"}</span>}
         </button>
