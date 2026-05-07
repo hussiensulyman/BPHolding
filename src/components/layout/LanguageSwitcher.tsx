@@ -7,59 +7,51 @@ import { APP_CONFIG, type AppLocale } from "@/lib/config/app-config";
 import { useLocale } from "@/lib/hooks/use-locale";
 
 interface LanguageSwitcherProps {
-  /** Render without the visible label above the select */
+  /** Render in compact mode (used inside header) */
   compact?: boolean;
 }
 
+const LANG_CONFIG: Record<AppLocale, { flag: string; short: string; label: string }> = {
+  ar: { flag: "🇸🇦", short: "AR", label: "العربية" },
+  en: { flag: "🇺🇸", short: "EN", label: "English" },
+};
+
 export function LanguageSwitcher({ compact = false }: LanguageSwitcherProps) {
-  const { locale, dir, t } = useLocale("languageSwitcher");
+  const { locale, t } = useLocale("languageSwitcher");
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
-  const switchLocale = useCallback(
-    (nextLocale: AppLocale) => {
-      if (nextLocale === locale) {
-        return;
-      }
+  const nextLocale: AppLocale = locale === "ar" ? "en" : "ar";
+  const current = LANG_CONFIG[locale];
+  const next = LANG_CONFIG[nextLocale];
 
-      startTransition(() => {
-        router.replace(pathname, { locale: nextLocale });
-      });
-    },
-    [locale, pathname, router],
-  );
+  const switchLocale = useCallback(() => {
+    startTransition(() => {
+      router.replace(pathname, { locale: nextLocale });
+    });
+  }, [nextLocale, pathname, router]);
 
   return (
-    <label className="text-flow-start flex flex-col gap-2 text-sm font-semibold text-primary">
-      {!compact && <span>{t("label")}</span>}
-      <div className="relative inline-flex">
+    <button
+      type="button"
+      data-testid={APP_CONFIG.testIds.languageSwitcher}
+      aria-label={`${t("label")}: ${next.label}`}
+      title={`Switch to ${next.label}`}
+      onClick={switchLocale}
+      disabled={isPending}
+      className={`inline-flex items-center gap-1.5 rounded-full border border-[var(--color-primary)]/25 bg-white/90 px-3 py-1.5 text-xs font-bold text-[var(--color-primary)] shadow-sm transition-all duration-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${compact ? "" : "text-sm"}`}
+    >
+      <span data-testid={APP_CONFIG.testIds.languageSwitcherIcon} aria-hidden="true">
+        {current.flag}
+      </span>
+      <span>{current.short}</span>
+      {isPending && (
         <span
+          className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent"
           aria-hidden="true"
-          data-testid={APP_CONFIG.testIds.languageSwitcherIcon}
-          className="icon-flip pointer-events-none absolute inset-inline-start-3 top-1/2 -translate-y-1/2"
-        >
-          {locale === "ar" ? "🇸🇦" : "🇺🇸"}
-        </span>
-        <select
-          aria-label={t("label")}
-          data-testid={APP_CONFIG.testIds.languageSwitcher}
-          className="appearance-none rounded-full border border-primary/30 bg-white py-2 pe-10 ps-11 text-start text-sm font-semibold text-primary shadow-sm transition hover:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-70"
-          value={locale}
-          dir={dir}
-          onChange={(event) => switchLocale(event.target.value as AppLocale)}
-          disabled={isPending}
-        >
-          <option value="ar">{t("arabicOption")}</option>
-          <option value="en">{t("englishOption")}</option>
-        </select>
-        <span
-          aria-hidden="true"
-          className="icon-flip pointer-events-none absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-xs"
-        >
-          ▾
-        </span>
-      </div>
-    </label>
+        />
+      )}
+    </button>
   );
 }

@@ -89,65 +89,81 @@ export default async function PortfolioPage({
   const projects = await portfolioService.listProjects(filters);
 
   return (
-    <main className="inline-pad mx-inline-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 py-10">
-      <header className="surface-card px-inline-4 py-8">
-        <h1 className="text-start text-4xl font-extrabold text-primary md:text-5xl">
-          {t("studioTitle")}
-        </h1>
-        <p className="text-start mt-4 max-w-4xl text-lg leading-8 text-slate-700">
-          {t("studioDescription")}
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <LocalizedLink
-            href="/"
-            className="inline-flex items-center rounded-full border border-primary/30 px-5 py-2 font-semibold text-primary transition hover:bg-primary hover:text-white"
-          >
-            {t("backToHome")}
-          </LocalizedLink>
+    <main className="flex min-h-screen flex-col">
+      {/* Page Hero */}
+      <div className="page-hero">
+        <div className="page-hero-glow" aria-hidden="true" />
+        <div className="page-hero-bottom" aria-hidden="true" />
+        <div className="section-container relative z-10">
+          <span className="page-hero-badge">{t("studioTitle")}</span>
+          <h1 className="text-start text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
+            {t("studioTitle")}
+          </h1>
+          <p className="text-start mt-4 max-w-2xl text-base leading-8 text-white/70 sm:text-lg">
+            {t("studioDescription")}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <LocalizedLink
+              href="/"
+              className="inline-flex min-h-[44px] items-center rounded-full border border-white/30 px-5 py-2 text-sm font-semibold text-white/80 transition hover:border-white hover:text-white"
+            >
+              {t("backToHome")}
+            </LocalizedLink>
+          </div>
         </div>
-      </header>
+      </div>
 
-      <FilterBar locale={activeLocale} availableYears={projects.availableYears} />
-
-      <PortfolioGrid items={projects.items} locale={activeLocale} />
-
-      <section className="flex items-center justify-between rounded-2xl border border-primary/15 bg-white px-4 py-3">
-        <p className="text-sm text-slate-600">
-          {activeLocale === "ar"
-            ? `صفحة ${projects.page} من ${projects.totalPages}`
-            : `Page ${projects.page} of ${projects.totalPages}`}
-        </p>
-        <div className="flex items-center gap-2">
-          <LocalizedLink
-            href={buildPaginationHref(
-              Math.max(1, projects.page - 1),
-              resolvedSearchParams,
-            )}
-            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-              projects.page <= 1
-                ? "pointer-events-none border-slate-300 text-slate-400"
-                : "border-primary/30 text-primary hover:bg-primary hover:text-white"
-            }`}
-            aria-label={activeLocale === "ar" ? "الصفحة السابقة" : "Previous page"}
-          >
-            {activeLocale === "ar" ? "السابق" : "Previous"}
-          </LocalizedLink>
-          <LocalizedLink
-            href={buildPaginationHref(
-              Math.min(projects.totalPages, projects.page + 1),
-              resolvedSearchParams,
-            )}
-            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-              projects.page >= projects.totalPages
-                ? "pointer-events-none border-slate-300 text-slate-400"
-                : "border-primary/30 text-primary hover:bg-primary hover:text-white"
-            }`}
-            aria-label={activeLocale === "ar" ? "الصفحة التالية" : "Next page"}
-          >
-            {activeLocale === "ar" ? "التالي" : "Next"}
-          </LocalizedLink>
+      {/* Content */}
+      <div className="bg-[var(--color-background)] flex flex-col gap-8 pt-10 pb-16">
+        <div className="section-container">
+          <FilterBar locale={activeLocale} availableYears={projects.availableYears} />
         </div>
-      </section>
+
+        <div className="section-container">
+          <PortfolioGrid items={projects.items} locale={activeLocale} />
+        </div>
+
+        {/* Pagination */}
+        <div className="section-container">
+          <div className="flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+            <p className="text-sm text-slate-600">
+              {activeLocale === "ar"
+                ? `صفحة ${projects.page} من ${projects.totalPages}`
+                : `Page ${projects.page} of ${projects.totalPages}`}
+            </p>
+            <div className="flex items-center gap-2">
+              <LocalizedLink
+                href={buildPaginationHref(
+                  Math.max(1, projects.page - 1),
+                  resolvedSearchParams,
+                )}
+                className={`min-h-[40px] rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                  projects.page <= 1
+                    ? "pointer-events-none border-slate-300 text-slate-400"
+                    : "border-[var(--color-primary)]/30 text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white"
+                }`}
+                aria-label={activeLocale === "ar" ? "الصفحة السابقة" : "Previous page"}
+              >
+                {activeLocale === "ar" ? "السابق" : "Previous"}
+              </LocalizedLink>
+              <LocalizedLink
+                href={buildPaginationHref(
+                  Math.min(projects.totalPages, projects.page + 1),
+                  resolvedSearchParams,
+                )}
+                className={`min-h-[40px] rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                  projects.page >= projects.totalPages
+                    ? "pointer-events-none border-slate-300 text-slate-400"
+                    : "border-[var(--color-primary)]/30 text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white"
+                }`}
+                aria-label={activeLocale === "ar" ? "الصفحة التالية" : "Next page"}
+              >
+                {activeLocale === "ar" ? "التالي" : "Next"}
+              </LocalizedLink>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

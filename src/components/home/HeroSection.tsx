@@ -37,7 +37,7 @@ export function HeroSection() {
       />
 
       {/* Content */}
-      <div className="section-container relative z-10 py-32 pt-36">
+      <div className="section-container relative z-10 py-24 pt-28 sm:py-32 sm:pt-36">
         <div className="max-w-2xl">
           {/* Badge */}
           <motion.div
@@ -95,7 +95,7 @@ export function HeroSection() {
 
         {/* Stats row */}
         <motion.div
-          className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4"
+          className="mt-10 grid grid-cols-2 gap-3 sm:mt-16 sm:grid-cols-4 sm:gap-4"
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -123,7 +123,7 @@ export function HeroSection() {
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-24 start-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1"
+        className="absolute bottom-24 inset-x-0 z-10 flex flex-col items-center gap-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
