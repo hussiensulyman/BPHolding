@@ -1,11 +1,10 @@
 "use client";
 
-import { Image as IKImage } from "@imagekit/next";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import type { AppLocale } from "@/lib/config/app-config";
-import { IMAGEKIT_PUBLIC_URL } from "@/lib/imagekit";
 
 type ProjectGalleryCarouselProps = {
   images: string[];
@@ -62,15 +61,13 @@ export function ProjectGalleryCarousel({
       }}
     >
       <div className="relative h-[260px] overflow-hidden rounded-2xl bg-slate-100 md:h-[500px]">
-        <IKImage
-          urlEndpoint={IMAGEKIT_PUBLIC_URL}
+        <Image
           src={activeImage}
           alt={description}
-          width={1200}
-          height={800}
-          fetchPriority="high"
-          transformation={[{ width: 1200, quality: 85, format: "webp" }]}
-          className="h-full w-full object-cover"
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, 1200px"
+          className="object-cover"
         />
 
         <button
@@ -110,15 +107,13 @@ export function ProjectGalleryCarousel({
                 isActive ? "border-primary" : "border-primary/20"
               }`}
             >
-              <IKImage
-                urlEndpoint={IMAGEKIT_PUBLIC_URL}
+              <Image
                 src={image}
                 alt={description}
-                width={240}
-                height={160}
+                fill
+                sizes="240px"
                 loading="lazy"
-                transformation={[{ width: 240, quality: 70, format: "webp" }]}
-                className="h-full w-full object-cover"
+                className="object-cover"
               />
             </button>
           );

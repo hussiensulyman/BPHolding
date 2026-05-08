@@ -15,6 +15,30 @@ const credentialsSchema = z.object({
 const FALLBACK_ADMIN_EMAIL = process.env.ADMIN_LOGIN_EMAIL ?? "admin@bpholding.net";
 const FALLBACK_ADMIN_PASSWORD = process.env.ADMIN_LOGIN_PASSWORD ?? "Admin@12345";
 
+function normalizeRedirectUrl(url: string | null | undefined): string | null {
+  if (!url) {
+    return null;
+  }
+
+  // Already relative, safe to use
+  if (url.startsWith("/") && !url.startsWith("//")) {
+    return url;
+  }
+
+  try {
+    const parsed = new URL(url);
+    const relative = `${parsed.pathname}${parsed.search}${parsed.hash}`;
+
+    if (relative.startsWith("/") && !relative.startsWith("//")) {
+      return relative;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   secret:
@@ -103,6 +127,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // Normalize absolute URLs to relative paths
+      const normalized = normalizeRedirectUrl(url);
+      if (normalized) {
+        return normalized;
+      }
+
+      // Only allow redirects to same origin or relative paths
+      if (url.startsWith("/")) return url;
+      if (new URL(url).origin === new URL(baseUrl).origin) return url;
+      return baseUrl;
     },
   },
 });

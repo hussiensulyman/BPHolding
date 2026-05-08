@@ -1,12 +1,11 @@
 "use client";
 
-import { Image as IKImage } from "@imagekit/next";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import { LocalizedLink } from "@/components/layout/LocalizedLink";
 import type { AppLocale } from "@/lib/config/app-config";
 import { APP_CONFIG } from "@/lib/config/app-config";
-import { IMAGEKIT_PUBLIC_URL } from "@/lib/imagekit";
 import type { PortfolioProject } from "@/lib/data/portfolio-service";
 
 type ProjectCardProps = {
@@ -54,16 +53,13 @@ export function ProjectCard({
     >
       <div className="relative h-[280px] w-full overflow-hidden bg-slate-100 md:h-[320px]">
         {project.coverImagePath ? (
-          <IKImage
-            urlEndpoint={IMAGEKIT_PUBLIC_URL}
+          <Image
             src={project.coverImagePath}
             alt={localizedDescription}
-            width={800}
-            height={560}
-            loading={prioritizeImage ? undefined : "lazy"}
-            fetchPriority={prioritizeImage ? "high" : "auto"}
-            transformation={[{ width: 800, quality: 85, format: "webp" }]}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            priority={prioritizeImage}
+            className="object-cover transition duration-300 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 via-primary/10 to-transparent">
