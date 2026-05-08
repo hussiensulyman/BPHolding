@@ -15,6 +15,15 @@ const credentialsSchema = z.object({
 const FALLBACK_ADMIN_EMAIL = process.env.ADMIN_LOGIN_EMAIL ?? "admin@bpholding.net";
 const FALLBACK_ADMIN_PASSWORD = process.env.ADMIN_LOGIN_PASSWORD ?? "Admin@12345";
 
+function createFallbackAdminUser(email: string) {
+  return {
+    id: "admin-dev",
+    email,
+    name: "BP Holding Admin",
+    role: "ADMIN" as const,
+  };
+}
+
 function normalizeRedirectUrl(url: string | null | undefined): string | null {
   if (!url) {
     return null;
@@ -66,42 +75,44 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const normalizedEmail = parsed.data.email.toLowerCase().trim();
 
+        // Always allow explicit fallback admin credentials to avoid first-hit failures
+        // when the database is cold/unavailable in production.
+        if (
+          normalizedEmail === FALLBACK_ADMIN_EMAIL.toLowerCase() &&
+          parsed.data.password === FALLBACK_ADMIN_PASSWORD
+        ) {
+          return createFallbackAdminUser(normalizedEmail);
+        }
+
         if (!process.env.DATABASE_URL) {
-          if (
-            normalizedEmail === FALLBACK_ADMIN_EMAIL.toLowerCase() &&
-            parsed.data.password === FALLBACK_ADMIN_PASSWORD
-          ) {
-            return {
-              id: "admin-dev",
-              email: normalizedEmail,
-              name: "BP Holding Admin",
-              role: "ADMIN" as const,
-            };
+          return null;
+        }
+
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: normalizedEmail },
+          });
+
+          if (!user || !user.isActive) {
+            return null;
           }
 
+          const passwordMatches = await compare(parsed.data.password, user.passwordHash);
+
+          if (!passwordMatches) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("[auth] credentials authorize failed", error);
           return null;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: normalizedEmail },
-        });
-
-        if (!user || !user.isActive) {
-          return null;
-        }
-
-        const passwordMatches = await compare(parsed.data.password, user.passwordHash);
-
-        if (!passwordMatches) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
       },
     }),
   ],
