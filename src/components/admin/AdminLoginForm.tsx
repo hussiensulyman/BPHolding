@@ -1,38 +1,13 @@
 "use client";
 
-import { getCsrfToken, signIn } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useActionState } from "react";
+
+import { adminLoginAction } from "@/app/[locale]/admin/login/actions";
 
 type AdminLoginFormProps = {
   locale: "ar" | "en";
   callbackUrl: string;
 };
-
-function normalizeRedirectUrl(
-  rawUrl: string | null | undefined,
-  fallback: string,
-): string {
-  if (!rawUrl) {
-    return fallback;
-  }
-
-  if (rawUrl.startsWith("/") && !rawUrl.startsWith("//")) {
-    return rawUrl;
-  }
-
-  try {
-    const parsed = new URL(rawUrl);
-    const relative = `${parsed.pathname}${parsed.search}${parsed.hash}`;
-
-    if (relative.startsWith("/") && !relative.startsWith("//")) {
-      return relative;
-    }
-  } catch {
-    return fallback;
-  }
-
-  return fallback;
-}
 
 const COPY = {
   en: {
@@ -60,97 +35,27 @@ const COPY = {
 } as const;
 
 export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
-  const [email, setEmail] = useState("admin@bpholding.net");
-  const [password, setPassword] = useState("Admin@12345");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [state, formAction, isPending] = useActionState(adminLoginAction, {
+    error: null,
+  });
 
   const text = COPY[locale];
 
-  useEffect(() => {
-    let active = true;
+  const errorMessage =
+    state.error === "invalid"
+      ? text.invalid
+      : state.error === "unavailable"
+        ? text.unavailable
+        : null;
 
-    async function warmCsrf() {
-      // Pre-warm NextAuth CSRF/session endpoints to avoid first-click cold failures.
-      for (let attempt = 0; attempt < 2; attempt += 1) {
-        try {
-          await getCsrfToken();
-          return;
-        } catch {
-          if (!active) {
-            return;
-          }
-          await new Promise((resolve) => window.setTimeout(resolve, 300));
-        }
-      }
-    }
-
-    void warmCsrf();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  async function attemptSignIn() {
-    return signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-      callbackUrl,
-    });
-  }
-
-  async function attemptSignInWithRecovery() {
-    let lastError: unknown = null;
-
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      try {
-        const result = await attemptSignIn();
-
-        if (result) {
-          return result;
-        }
-
-        await getCsrfToken();
-      } catch (error) {
-        lastError = error;
-        await getCsrfToken();
-      }
-
-      // Small delay between retries for cold serverless/auth endpoints.
-      await new Promise((resolve) => window.setTimeout(resolve, 350 * (attempt + 1)));
-    }
-
-    throw lastError ?? new Error("SIGN_IN_RETRY_FAILED");
-  }
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const result = await attemptSignInWithRecovery();
-
-      if (!result || result.error) {
-        setError(text.invalid);
-        return;
-      }
-
-      const safeRedirect = normalizeRedirectUrl(result.url, callbackUrl);
-      window.location.replace(safeRedirect);
-    } catch {
-      setError(text.unavailable);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
   return (
     <form
-      onSubmit={handleSubmit}
+      action={formAction}
       className="relative z-10 mx-auto w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-sm"
     >
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="callbackUrl" value={callbackUrl} />
+
       {/* BP Logo */}
       <div className="mb-6 flex flex-col items-center gap-3">
         <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#df9a13] text-xl font-extrabold text-[#052a42] shadow-lg">
@@ -166,8 +71,8 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
         <span>{text.email}</span>
         <input
           type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          name="email"
+          defaultValue="admin@bpholding.net"
           className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-white placeholder-white/30 outline-none ring-[#df9a13]/60 transition focus:border-[#df9a13]/60 focus:ring-2"
           required
         />
@@ -177,8 +82,8 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
         <span>{text.password}</span>
         <input
           type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          name="password"
+          defaultValue="Admin@12345"
           className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-white placeholder-white/30 outline-none ring-[#df9a13]/60 transition focus:border-[#df9a13]/60 focus:ring-2"
           required
         />
@@ -192,18 +97,18 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
         {locale === "ar" ? "تذكرني" : "Remember me"}
       </label>
 
-      {error ? (
+      {errorMessage ? (
         <p className="mb-4 rounded-lg bg-red-500/20 px-3 py-2 text-sm text-red-200">
-          {error}
+          {errorMessage}
         </p>
       ) : null}
 
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isPending}
         className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#df9a13] px-4 py-3 font-bold text-[#052a42] transition hover:bg-[#df9a13]/90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isSubmitting ? (
+        {isPending ? (
           <>
             <span
               aria-hidden="true"
