@@ -15,7 +15,7 @@ import { signOut } from "next-auth/react";
 import { useState } from "react";
 
 import { LocalizedLink } from "@/components/layout/LocalizedLink";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { usePathname } from "@/i18n/navigation";
 import { filterAdminNavByRole } from "@/components/admin/layout/admin-nav";
 import { useAdminNotifications } from "@/components/admin/layout/AdminNotificationsProvider";
 
@@ -35,7 +35,6 @@ type SidebarNavProps = {
 
 export function SidebarNav({ locale, role }: SidebarNavProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const { submissionBadgeCount } = useAdminNotifications();
   const navItems = filterAdminNavByRole(role, locale);
@@ -120,9 +119,8 @@ export function SidebarNav({ locale, role }: SidebarNavProps) {
         <button
           type="button"
           onClick={async () => {
-            router.refresh();
             await signOut({ redirect: false });
-            router.push("/admin/login");
+            window.location.replace(`/${locale}`);
           }}
           className={`flex min-h-[44px] w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-900/30 hover:text-red-300 ${collapsed ? "justify-center" : ""}`}
         >

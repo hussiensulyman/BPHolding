@@ -113,16 +113,20 @@ export default async function proxy(request: NextRequest) {
 
   // Protected admin pages: require a valid admin role.
   if (role === null || !isAdminRole(role as Parameters<typeof isAdminRole>[0])) {
-    // Use a clean redirect URL without callbackUrl encoding loops.
-    const callbackUrl = encodeURIComponent(`${pathname}${search}`);
+    const normalizedAdminRoot = `/${route.locale}/admin`;
+    const isBareAdminRoot = pathname === "/admin" || pathname === normalizedAdminRoot;
+
+    // Keep login URL clean for bare /admin requests, but preserve callback for deep links.
+    const loginUrl = isBareAdminRoot
+      ? `/${route.locale}/admin/login`
+      : `/${route.locale}/admin/login?callbackUrl=${encodeURIComponent(`${pathname}${search}`)}`;
+
     if (process.env.NODE_ENV === "development") {
       console.log(
         `[proxy] ${pathname} → unauthenticated redirect ${Date.now() - start}ms`,
       );
     }
-    return NextResponse.redirect(
-      new URL(`/${route.locale}/admin/login?callbackUrl=${callbackUrl}`, request.url),
-    );
+    return NextResponse.redirect(new URL(loginUrl, request.url));
   }
 
   if (
