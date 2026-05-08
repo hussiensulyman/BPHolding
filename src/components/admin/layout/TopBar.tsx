@@ -3,6 +3,8 @@
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 
+import { useRouter } from "@/i18n/navigation";
+
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { useAdminNotifications } from "@/components/admin/layout/AdminNotificationsProvider";
 
@@ -13,6 +15,7 @@ type TopBarProps = {
 };
 
 export function TopBar({ locale, userName, userRole }: TopBarProps) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const { submissionBadgeCount } = useAdminNotifications();
 
@@ -66,7 +69,10 @@ export function TopBar({ locale, userName, userRole }: TopBarProps) {
               </div>
               <button
                 type="button"
-                onClick={() => signOut({ callbackUrl: `/${locale}/admin/login` })}
+                onClick={() => {
+                  router.refresh();
+                  signOut({ callbackUrl: `/${locale}/admin/login` });
+                }}
                 className="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50"
               >
                 <span>⎋</span>

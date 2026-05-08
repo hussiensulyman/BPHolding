@@ -1,8 +1,7 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
-import { useLayoutEffect, useRef, useState } from "react";
 
 interface SectionWrapperProps {
   children: ReactNode;
@@ -19,36 +18,26 @@ export function SectionWrapper({
   delay = 0,
   style,
 }: SectionWrapperProps) {
-  const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-  // On back-navigation the browser restores scroll position; if the section is
-  // already within the viewport on mount we show it immediately (no fade-in).
-  const [skipAnimation, setSkipAnimation] = useState(false);
-
-  useLayoutEffect(() => {
-    if (!ref.current) return;
-    const { top, bottom } = ref.current.getBoundingClientRect();
-    // Skip animation if section is in viewport OR already above viewport
-    // (covers back-navigation with scroll-position restoration)
-    const inViewport = top < window.innerHeight && bottom > 0;
-    const aboveViewport = bottom <= 0;
-    if (inViewport || aboveViewport) {
-      setSkipAnimation(true);
-    }
-  }, []);
-
-  const show = isInView || skipAnimation;
-
+  // Use framer-motion's native whileInView rather than a manual animate+useInView
+  // combination. The controlled-state approach (animate={show ? ... : ...}) has a
+  // failure mode: if BOTH useLayoutEffect and IntersectionObserver miss the initial
+  // viewport check (e.g. section is exactly at the fold), the section stays locked
+  // at opacity:0 with no recovery path.
+  //
+  // whileInView uses its own IntersectionObserver internally. The generous margin
+  // (200px top and bottom) ensures sections right at the viewport edge — specifically
+  // AboutSection which starts at exactly Hero's bottom (~100vh) — are always
+  // triggered without the user needing to scroll.
   return (
     <motion.section
-      ref={ref}
       id={id}
       initial={{ opacity: 0, y: 32 }}
-      animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "200px 0px 200px 0px" }}
       transition={{
-        duration: skipAnimation ? 0 : 0.65,
+        duration: 0.65,
         ease: [0.22, 1, 0.36, 1],
-        delay: skipAnimation ? 0 : delay,
+        delay,
       }}
       className={className}
       style={style}

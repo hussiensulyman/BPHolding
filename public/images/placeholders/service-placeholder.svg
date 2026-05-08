@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#f2f5f7"/>
+  <rect x="340" y="190" width="120" height="90" rx="8" fill="#d1d9e0"/>
+  <circle cx="370" cy="210" r="15" fill="#b0bec5"/>
+  <polygon points="340,280 380,230 420,260 460,220 500,280" fill="#b0bec5"/>
+  <text x="400" y="330" font-family="Arial,sans-serif" font-size="16" fill="#90a4ae" text-anchor="middle">Service Image</text>
+</svg>

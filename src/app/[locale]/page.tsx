@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 import type { AppLocale } from "@/lib/config/app-config";
 import { HeroSection } from "@/components/home/HeroSection";
 import { AboutSection } from "@/components/home/AboutSection";
@@ -107,21 +105,13 @@ export default async function HomePage({
       />
 
       <HeroSection />
-      <Suspense fallback={<SectionFallback />}>
-        <AboutSection locale={activeLocale} />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <ServicesSection locale={activeLocale} />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <PortfolioPreview locale={activeLocale} />
-      </Suspense>
-      <Suspense fallback={<SectionFallback dark />}>
-        <WhyChooseUsSection locale={activeLocale} />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <CertificationsSection locale={activeLocale} />
-      </Suspense>
+      {/* Sections render in one RSC pass – no Suspense to avoid concurrent-render
+          timing issues with SectionWrapper's useLayoutEffect viewport check. */}
+      <AboutSection locale={activeLocale} />
+      <ServicesSection locale={activeLocale} />
+      <PortfolioPreview locale={activeLocale} />
+      <WhyChooseUsSection locale={activeLocale} />
+      <CertificationsSection locale={activeLocale} />
       <ContactSection />
     </main>
   );

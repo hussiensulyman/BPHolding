@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f2f5f7"/>
+  <rect x="340" y="230" width="120" height="90" rx="8" fill="#d1d9e0"/>
+  <circle cx="370" cy="250" r="15" fill="#b0bec5"/>
+  <polygon points="340,320 380,270 420,300 460,260 500,320" fill="#b0bec5"/>
+  <text x="400" y="370" font-family="Arial,sans-serif" font-size="16" fill="#90a4ae" text-anchor="middle">Project Image</text>
+</svg>
