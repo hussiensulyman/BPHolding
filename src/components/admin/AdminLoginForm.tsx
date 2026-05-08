@@ -1,7 +1,7 @@
 "use client";
 
 import { getCsrfToken, signIn } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type AdminLoginFormProps = {
   locale: "ar" | "en";
@@ -67,6 +67,31 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
 
   const text = COPY[locale];
 
+  useEffect(() => {
+    let active = true;
+
+    async function warmCsrf() {
+      // Pre-warm NextAuth CSRF/session endpoints to avoid first-click cold failures.
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          await getCsrfToken();
+          return;
+        } catch {
+          if (!active) {
+            return;
+          }
+          await new Promise((resolve) => window.setTimeout(resolve, 300));
+        }
+      }
+    }
+
+    void warmCsrf();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   async function attemptSignIn() {
     return signIn("credentials", {
       redirect: false,
@@ -76,19 +101,37 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
     });
   }
 
+  async function attemptSignInWithRecovery() {
+    let lastError: unknown = null;
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const result = await attemptSignIn();
+
+        if (result) {
+          return result;
+        }
+
+        await getCsrfToken();
+      } catch (error) {
+        lastError = error;
+        await getCsrfToken();
+      }
+
+      // Small delay between retries for cold serverless/auth endpoints.
+      await new Promise((resolve) => window.setTimeout(resolve, 350 * (attempt + 1)));
+    }
+
+    throw lastError ?? new Error("SIGN_IN_RETRY_FAILED");
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     try {
-      let result = await attemptSignIn();
-
-      // Recover from transient first-request failures by refreshing CSRF and retrying once.
-      if (!result) {
-        await getCsrfToken();
-        result = await attemptSignIn();
-      }
+      const result = await attemptSignInWithRecovery();
 
       if (!result || result.error) {
         setError(text.invalid);
@@ -98,21 +141,7 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
       const safeRedirect = normalizeRedirectUrl(result.url, callbackUrl);
       window.location.replace(safeRedirect);
     } catch {
-      try {
-        await getCsrfToken();
-        const retryResult = await attemptSignIn();
-
-        if (!retryResult || retryResult.error) {
-          setError(text.invalid);
-          return;
-        }
-
-        const safeRedirect = normalizeRedirectUrl(retryResult.url, callbackUrl);
-        window.location.replace(safeRedirect);
-        return;
-      } catch {
-        setError(text.unavailable);
-      }
+      setError(text.unavailable);
     } finally {
       setIsSubmitting(false);
     }
