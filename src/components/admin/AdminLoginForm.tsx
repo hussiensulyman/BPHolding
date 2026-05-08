@@ -59,8 +59,6 @@ const COPY = {
   },
 } as const;
 
-const SIGN_IN_TIMEOUT_MS = 15000;
-
 export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
   const [email, setEmail] = useState("admin@bpholding.net");
   const [password, setPassword] = useState("Admin@12345");
@@ -74,24 +72,13 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
     setIsSubmitting(true);
     setError(null);
 
-    let timeoutId: number | undefined;
-
     try {
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        timeoutId = window.setTimeout(() => {
-          reject(new Error("SIGN_IN_TIMEOUT"));
-        }, SIGN_IN_TIMEOUT_MS);
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+        callbackUrl,
       });
-
-      const result = await Promise.race([
-        signIn("credentials", {
-          redirect: false,
-          email,
-          password,
-          callbackUrl,
-        }),
-        timeoutPromise,
-      ]);
 
       if (!result || result.error) {
         setError(text.invalid);
@@ -103,9 +90,6 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
     } catch {
       setError(text.unavailable);
     } finally {
-      if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
-      }
       setIsSubmitting(false);
     }
   }
@@ -164,9 +148,19 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-xl bg-[#df9a13] px-4 py-3 font-bold text-[#052a42] transition hover:bg-[#df9a13]/90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#df9a13] px-4 py-3 font-bold text-[#052a42] transition hover:bg-[#df9a13]/90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isSubmitting ? text.submitting : text.submit}
+        {isSubmitting ? (
+          <>
+            <span
+              aria-hidden="true"
+              className="h-4 w-4 animate-spin rounded-full border-2 border-[#052a42]/30 border-t-[#052a42]"
+            />
+            {text.submitting}
+          </>
+        ) : (
+          text.submit
+        )}
       </button>
 
       {/* Demo credentials */}
