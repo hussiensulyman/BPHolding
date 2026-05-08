@@ -3,6 +3,8 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 
+import { useRouter } from "@/i18n/navigation";
+
 type AdminLoginFormProps = {
   locale: "ar" | "en";
   callbackUrl: string;
@@ -58,6 +60,7 @@ const COPY = {
 } as const;
 
 export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
+  const router = useRouter();
   const [email, setEmail] = useState("admin@bpholding.net");
   const [password, setPassword] = useState("Admin@12345");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,9 +88,8 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
     }
 
     const safeRedirect = normalizeRedirectUrl(result.url, callbackUrl);
-    window.location.assign(safeRedirect);
+    await router.push(safeRedirect);
   }
-
   return (
     <form
       onSubmit={handleSubmit}

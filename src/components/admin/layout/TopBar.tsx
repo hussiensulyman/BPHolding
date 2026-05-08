@@ -72,7 +72,7 @@ export function TopBar({ locale, userName, userRole }: TopBarProps) {
                 onClick={async () => {
                   router.refresh();
                   await signOut({ redirect: false });
-                  router.push(`/${locale}/admin/login`);
+                  router.push("/admin/login");
                 }}
                 className="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50"
               >

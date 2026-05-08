@@ -122,7 +122,7 @@ export function SidebarNav({ locale, role }: SidebarNavProps) {
           onClick={async () => {
             router.refresh();
             await signOut({ redirect: false });
-            router.push(`/${locale}/admin/login`);
+            router.push("/admin/login");
           }}
           className={`flex min-h-[44px] w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-900/30 hover:text-red-300 ${collapsed ? "justify-center" : ""}`}
         >
