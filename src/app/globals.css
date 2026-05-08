@@ -51,6 +51,11 @@ body {
     var(--font-fallback-en, "Segoe UI", "Helvetica Neue", Arial, sans-serif);
 }
 
+html[data-admin-route="1"] [data-site-header],
+html[data-admin-route="1"] [data-site-footer] {
+  display: none !important;
+}
+
 html[dir="rtl"] body {
   font-family:
     var(--font-ar-cairo), var(--font-ar-plex),
@@ -429,7 +434,11 @@ textarea.form-input {
 
 /* ===== HERO SECTION ===== */
 .hero-section-bg {
-  background: linear-gradient(135deg, #052a42 0%, #0a3a5c 50%, #0d4e78 100%);
+  background-image:
+    linear-gradient(115deg, rgba(5, 30, 48, 0.84) 5%, rgba(5, 30, 48, 0.5) 55%),
+    url("/assets/home/hero-night.jpg");
+  background-size: cover;
+  background-position: center;
 }
 .hero-overlay-pattern {
   background-image: repeating-linear-gradient(
@@ -453,7 +462,11 @@ textarea.form-input {
 
 /* ===== ABOUT SECTION ===== */
 .about-img-gradient {
-  background: linear-gradient(135deg, #052a42 0%, #0a4a72 60%, #0d5e90 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(5, 42, 66, 0.15) 0%,
+    rgba(5, 42, 66, 0.25) 100%
+  );
 }
 .about-img-pattern {
   background-image: repeating-linear-gradient(
@@ -496,22 +509,46 @@ textarea.form-input {
   );
 }
 .pf-bg-0 {
-  background: linear-gradient(135deg, #052a42 0%, #0a4a72 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(5, 42, 66, 0.34) 0%,
+    rgba(10, 74, 114, 0.26) 100%
+  );
 }
 .pf-bg-1 {
-  background: linear-gradient(135deg, #0a4a72 0%, #0d5e90 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(10, 74, 114, 0.34) 0%,
+    rgba(13, 94, 144, 0.26) 100%
+  );
 }
 .pf-bg-2 {
-  background: linear-gradient(135deg, #0d2035 0%, #052a42 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(13, 32, 53, 0.34) 0%,
+    rgba(5, 42, 66, 0.26) 100%
+  );
 }
 .pf-bg-3 {
-  background: linear-gradient(135deg, #1a3a52 0%, #2a5a7a 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(26, 58, 82, 0.34) 0%,
+    rgba(42, 90, 122, 0.26) 100%
+  );
 }
 .pf-bg-4 {
-  background: linear-gradient(135deg, #0a2e47 0%, #155075 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(10, 46, 71, 0.34) 0%,
+    rgba(21, 80, 117, 0.26) 100%
+  );
 }
 .pf-bg-5 {
-  background: linear-gradient(135deg, #082436 0%, #0d4068 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(8, 36, 54, 0.34) 0%,
+    rgba(13, 64, 104, 0.26) 100%
+  );
 }
 
 /* ===== WHY CHOOSE US ===== */

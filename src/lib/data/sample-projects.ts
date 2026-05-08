@@ -3,6 +3,7 @@ export type SeedProject = {
   slug: string;
   status: "ongoing" | "completed";
   sector: "commercial" | "residential" | "infrastructure";
+  imagePath: string;
   title: {
     en: string;
     ar: string;
@@ -19,6 +20,7 @@ export const SAMPLE_PROJECTS: SeedProject[] = [
     slug: "bp-tower-fitout",
     status: "ongoing",
     sector: "commercial",
+    imagePath: "/portfolio/al-malqa/cover.jpg",
     title: {
       en: "Riyadh Commercial Tower Fit-Out",
       ar: "تشطيبات برج تجاري في الرياض",
@@ -33,6 +35,7 @@ export const SAMPLE_PROJECTS: SeedProject[] = [
     slug: "neom-housing-package",
     status: "ongoing",
     sector: "residential",
+    imagePath: "/portfolio/al-yasmin/cover.jpg",
     title: {
       en: "NEOM Workforce Housing Package",
       ar: "حزمة إسكان القوى العاملة في نيوم",
@@ -47,6 +50,7 @@ export const SAMPLE_PROJECTS: SeedProject[] = [
     slug: "jeddah-logistics-revamp",
     status: "completed",
     sector: "infrastructure",
+    imagePath: "/portfolio/al-arid/cover.jpg",
     title: {
       en: "Jeddah Logistics Hub Revamp",
       ar: "تطوير مركز الخدمات اللوجستية في جدة",

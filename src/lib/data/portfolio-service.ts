@@ -241,6 +241,74 @@ const PROJECT_ENHANCEMENTS: Partial<Record<string, ProjectEnhancement>> = {
       "/portfolio/prince-fawaz/gallery-2.jpg",
     ],
   },
+  "al-janaderiyah-urban-housing-riyadh": {
+    area: "22,100 m2",
+    timelineEn: "Q4 2023 - Q3 2024",
+    timelineAr: "الربع الرابع 2023 - الربع الثالث 2024",
+    servicesEn: ["Site Grading", "Utility Routing", "Smart Home MEP Integration"],
+    servicesAr: [
+      "تسوية الموقع",
+      "مسارات المرافق",
+      "تكامل الأنظمة الذكية الكهروميكانيكية",
+    ],
+    coverImagePath: "/portfolio/al-janaderiyah/cover.jpg",
+    gallery: [
+      "/portfolio/al-janaderiyah/cover.jpg",
+      "/portfolio/al-janaderiyah/gallery-1.jpg",
+      "/portfolio/al-janaderiyah/gallery-2.jpg",
+    ],
+  },
+  "al-yasmin-premium-villas-riyadh": {
+    area: "19,400 m2",
+    timelineEn: "Q1 2024 - Q1 2025",
+    timelineAr: "الربع الأول 2024 - الربع الأول 2025",
+    servicesEn: [
+      "Turnkey Villa Construction",
+      "Energy Efficient HVAC",
+      "Luxury Interior Design",
+    ],
+    servicesAr: ["تنفيذ فلل متكامل", "أنظمة تكييف عالية الكفاءة", "تصميم داخلي فاخر"],
+    coverImagePath: "/portfolio/al-yasmin/cover.jpg",
+    gallery: [
+      "/portfolio/al-yasmin/cover.jpg",
+      "/portfolio/al-yasmin/gallery-1.jpg",
+      "/portfolio/al-yasmin/gallery-2.jpg",
+    ],
+  },
+  "al-shatea-commercial-offices-jeddah": {
+    area: "17,250 m2",
+    timelineEn: "Q3 2022 - Q2 2023",
+    timelineAr: "الربع الثالث 2022 - الربع الثاني 2023",
+    servicesEn: ["Commercial Fit-Out", "MEP Modernization", "Fire Protection Upgrade"],
+    servicesAr: [
+      "تشطيبات تجارية",
+      "تحديث الأنظمة الكهروميكانيكية",
+      "تطوير الحماية من الحريق",
+    ],
+    coverImagePath: "/portfolio/al-shatea/cover.jpg",
+    gallery: [
+      "/portfolio/al-shatea/cover.jpg",
+      "/portfolio/al-shatea/gallery-1.jpg",
+      "/portfolio/al-shatea/gallery-2.jpg",
+    ],
+  },
+  "al-arid-residential-expansion-riyadh": {
+    area: "24,600 m2",
+    timelineEn: "Q2 2024 - Q4 2024",
+    timelineAr: "الربع الثاني 2024 - الربع الرابع 2024",
+    servicesEn: [
+      "Structural Reinforcement",
+      "Block Expansion",
+      "End-to-End Contractor Coordination",
+    ],
+    servicesAr: ["تدعيم إنشائي", "توسعة كتل المباني", "تنسيق شامل بين المقاولين"],
+    coverImagePath: "/portfolio/al-arid/cover.jpg",
+    gallery: [
+      "/portfolio/al-arid/cover.jpg",
+      "/portfolio/al-arid/gallery-1.jpg",
+      "/portfolio/al-arid/gallery-2.jpg",
+    ],
+  },
 };
 
 export type PortfolioProject = {

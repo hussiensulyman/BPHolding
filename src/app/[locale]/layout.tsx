@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { AdminRouteChromeToggle } from "@/components/layout/AdminRouteChromeToggle";
 import { routing } from "@/i18n/routing";
 import { APP_CONFIG, type AppLocale } from "@/lib/config/app-config";
 import { LocaleDirectionProvider } from "@/lib/contexts/locale-direction-context";
@@ -58,9 +59,18 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <LocaleDirectionProvider locale={activeLocale} direction={direction}>
-        {!isAdmin && <Header />}
+        <AdminRouteChromeToggle />
+        {!isAdmin && (
+          <div data-site-header>
+            <Header />
+          </div>
+        )}
         {children}
-        {!isAdmin && <Footer locale={activeLocale} />}
+        {!isAdmin && (
+          <div data-site-footer>
+            <Footer locale={activeLocale} />
+          </div>
+        )}
       </LocaleDirectionProvider>
     </NextIntlClientProvider>
   );

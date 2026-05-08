@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import { usePathname } from "@/i18n/navigation";
@@ -87,8 +88,15 @@ export function Header() {
             className="flex items-center gap-2.5 shrink-0"
             aria-label="BP Holding – Home"
           >
-            <span className="bp-logo-navy flex h-9 w-9 items-center justify-center rounded-lg font-extrabold text-sm tracking-tight">
-              BP
+            <span className="relative h-9 w-9 overflow-hidden rounded-lg ring-1 ring-white/30">
+              <Image
+                src="/assets/branding/image.png"
+                alt="BP Holding"
+                fill
+                sizes="36px"
+                className="object-cover"
+                priority
+              />
             </span>
             <span
               className={`hidden sm:block font-bold text-base leading-tight transition-colors duration-300 ${
@@ -136,7 +144,7 @@ export function Header() {
                 : "text-white hover:bg-white/10"
             }`}
             aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
-            aria-expanded={menuOpen ? "true" : "false"}
+            aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             onClick={() => setMenuOpen((p) => !p)}
           >

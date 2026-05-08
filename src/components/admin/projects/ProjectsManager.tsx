@@ -26,6 +26,7 @@ type ProjectItem = {
   year?: number | null;
   status: ProjectStatus;
   featured: boolean;
+  coverImageUrl?: string | null;
 };
 
 type FormState = {
@@ -187,6 +188,56 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
     await loadProjects();
   }
 
+  async function handleEdit(project: ProjectItem) {
+    const response = await fetch(`/api/admin/projects/${project.id}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      setForm({
+        id: project.id,
+        slug: project.slug,
+        titleEn: project.titleEn,
+        titleAr: project.titleAr,
+        descriptionEn: project.descriptionEn,
+        descriptionAr: project.descriptionAr,
+        category: project.category,
+        city: project.city,
+        location: project.location,
+        year: project.year ? String(project.year) : "",
+        status: project.status,
+        featured: project.featured,
+        imageUrls: project.coverImageUrl ? project.coverImageUrl : "",
+      });
+      return;
+    }
+
+    const payload = (await response.json()) as {
+      success: boolean;
+      data?: {
+        imageUrls?: string[];
+      };
+    };
+
+    const imageUrls = payload.data?.imageUrls ?? [];
+
+    setForm({
+      id: project.id,
+      slug: project.slug,
+      titleEn: project.titleEn,
+      titleAr: project.titleAr,
+      descriptionEn: project.descriptionEn,
+      descriptionAr: project.descriptionAr,
+      category: project.category,
+      city: project.city,
+      location: project.location,
+      year: project.year ? String(project.year) : "",
+      status: project.status,
+      featured: project.featured,
+      imageUrls: imageUrls.join("\n"),
+    });
+  }
+
   return (
     <section className="grid gap-6">
       {/* Form */}
@@ -326,23 +377,7 @@ export function ProjectsManager({ locale }: { locale: "ar" | "en" }) {
         loading={loading}
         onInlineUpdate={handleInlineUpdate}
         onBulkAction={handleBulkAction}
-        onEdit={(project) =>
-          setForm({
-            id: project.id,
-            slug: project.slug,
-            titleEn: project.titleEn,
-            titleAr: project.titleAr,
-            descriptionEn: project.descriptionEn,
-            descriptionAr: project.descriptionAr,
-            category: project.category,
-            city: project.city,
-            location: project.location,
-            year: project.year ? String(project.year) : "",
-            status: project.status,
-            featured: project.featured,
-            imageUrls: "",
-          })
-        }
+        onEdit={(project) => void handleEdit(project)}
       />
 
       <datalist id="project-categories">

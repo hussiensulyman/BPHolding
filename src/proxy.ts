@@ -16,6 +16,7 @@ const AUTH_SECRET =
 type RouteInfo = {
   locale: string;
   section: string;
+  hasLocalePrefix: boolean;
   isAdminRoute: boolean;
   isLoginRoute: boolean;
 };
@@ -34,6 +35,7 @@ function extractAdminSection(pathname: string): RouteInfo {
   return {
     locale,
     section,
+    hasLocalePrefix,
     isAdminRoute,
     isLoginRoute: isAdminRoute && normalizedSegments[1] === "login",
   };
@@ -60,10 +62,24 @@ export default async function proxy(request: NextRequest) {
 
   const route = extractAdminSection(pathname);
 
+  const requestHeaders = new Headers(request.headers);
+
+  if (route.isAdminRoute) {
+    requestHeaders.set("x-is-admin", "1");
+
+    // Ensure all admin traffic is locale-prefixed so App Router resolves the
+    // same layout tree in local and production.
+    if (!route.hasLocalePrefix) {
+      const targetPath = `/${route.locale}${pathname}`;
+      return NextResponse.redirect(new URL(`${targetPath}${search}`, request.url));
+    }
+  } else {
+    requestHeaders.set("x-is-admin", "0");
+  }
+
   // PUBLIC ROUTES: Skip auth entirely – just apply i18n routing.
   if (!route.isAdminRoute) {
     const response = intlMiddleware(request);
-    response.headers.set("x-is-admin", "0");
     if (process.env.NODE_ENV === "development") {
       console.log(`[proxy] ${pathname} → public ${Date.now() - start}ms`);
     }
@@ -84,8 +100,11 @@ export default async function proxy(request: NextRequest) {
       }
       return NextResponse.redirect(new URL(`/${route.locale}/admin`, request.url));
     }
-    const loginResponse = intlMiddleware(request);
-    loginResponse.headers.set("x-is-admin", "1");
+    const loginResponse = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
     if (process.env.NODE_ENV === "development") {
       console.log(`[proxy] ${pathname} → login page ${Date.now() - start}ms`);
     }
@@ -120,8 +139,11 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${route.locale}/admin`, request.url));
   }
 
-  const response = intlMiddleware(request);
-  response.headers.set("x-is-admin", "1");
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
   if (process.env.NODE_ENV === "development") {
     console.log(`[proxy] ${pathname} → admin ${Date.now() - start}ms`);
   }

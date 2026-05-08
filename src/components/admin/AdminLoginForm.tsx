@@ -8,6 +8,32 @@ type AdminLoginFormProps = {
   callbackUrl: string;
 };
 
+function normalizeRedirectUrl(
+  rawUrl: string | null | undefined,
+  fallback: string,
+): string {
+  if (!rawUrl) {
+    return fallback;
+  }
+
+  if (rawUrl.startsWith("/") && !rawUrl.startsWith("//")) {
+    return rawUrl;
+  }
+
+  try {
+    const parsed = new URL(rawUrl);
+    const relative = `${parsed.pathname}${parsed.search}${parsed.hash}`;
+
+    if (relative.startsWith("/") && !relative.startsWith("//")) {
+      return relative;
+    }
+  } catch {
+    return fallback;
+  }
+
+  return fallback;
+}
+
 const COPY = {
   en: {
     title: "Admin Login",
@@ -58,7 +84,8 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
       return;
     }
 
-    window.location.href = result.url ?? callbackUrl;
+    const safeRedirect = normalizeRedirectUrl(result.url, callbackUrl);
+    window.location.assign(safeRedirect);
   }
 
   return (

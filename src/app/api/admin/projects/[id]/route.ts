@@ -20,6 +20,36 @@ const updateProjectSchema = z.object({
   imageUrls: z.array(z.string().url()).optional(),
 });
 
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { user, response } = await requireAdminApiUser("projects");
+
+  if (!user) {
+    return response;
+  }
+
+  const { id } = await params;
+  const { repository, projectAdminService } = createAdminServicesContext();
+
+  const [project, images] = await Promise.all([
+    repository.findById(id),
+    projectAdminService.listImages(id),
+  ]);
+
+  if (!project) {
+    return badRequest("Project not found", 404);
+  }
+
+  return ok({
+    project,
+    imageUrls: images
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((image) => image.imageUrl),
+  });
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },

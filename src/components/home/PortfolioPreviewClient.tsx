@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useState } from "react";
 
 import type { AppLocale } from "@/lib/config/app-config";
@@ -9,6 +10,7 @@ interface Project {
   id: string;
   slug: string;
   sector: string;
+  imagePath: string;
   title: { en: string; ar: string };
   summary: { en: string; ar: string };
 }
@@ -63,7 +65,7 @@ export function PortfolioPreviewClient({
           <button
             key={key}
             role="tab"
-            aria-selected={activeFilter === key ? "true" : "false"}
+            aria-selected={activeFilter === key}
             onClick={() => setActiveFilter(key)}
             className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors min-h-[44px] ${
               activeFilter === key
@@ -94,11 +96,17 @@ export function PortfolioPreviewClient({
               className="portfolio-card aspect-[4/3]"
             >
               {/* Background */}
+              <div className="absolute inset-0">
+                <Image
+                  src={project.imagePath}
+                  alt={title}
+                  fill
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 32vw, (min-width: 640px) 48vw, 100vw"
+                />
+              </div>
               <div className={`pf-bg-${i % 6} absolute inset-0`}>
                 <div className="pf-card-pattern absolute inset-0 opacity-20" />
-                <span className="absolute inset-0 flex items-center justify-center text-7xl font-extrabold text-white/10">
-                  BP
-                </span>
               </div>
 
               {/* Overlay */}

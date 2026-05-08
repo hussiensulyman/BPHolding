@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 
 type ProjectStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
@@ -23,6 +24,7 @@ type ProjectItem = {
   year?: number | null;
   status: ProjectStatus;
   featured: boolean;
+  coverImageUrl?: string | null;
 };
 
 type BulkAction = "PUBLISH" | "ARCHIVE" | "DRAFT" | "DELETE";
@@ -54,6 +56,7 @@ const TABLE_COPY = {
     draft: "Move to Draft",
     remove: "Delete",
     titleHeader: "Title",
+    image: "Image",
     category: "Category",
     city: "City",
     year: "Year",
@@ -74,6 +77,7 @@ const TABLE_COPY = {
     draft: "تحويل لمسودة",
     remove: "حذف",
     titleHeader: "العنوان",
+    image: "الصورة",
     category: "الفئة",
     city: "المدينة",
     year: "السنة",
@@ -167,6 +171,9 @@ export function ProjectsTable({
                 />
               </th>
               <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {text.image}
+              </th>
+              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
                 {text.titleHeader}
               </th>
               <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -200,6 +207,23 @@ export function ProjectsTable({
                     checked={selectedSet.has(item.id)}
                     onChange={() => toggleSelect(item.id)}
                   />
+                </td>
+                <td className="px-4 py-3">
+                  {item.coverImageUrl ? (
+                    <div className="relative h-12 w-16 overflow-hidden rounded-md ring-1 ring-slate-200">
+                      <Image
+                        src={item.coverImageUrl}
+                        alt={locale === "ar" ? item.titleAr : item.titleEn}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex h-12 w-16 items-center justify-center rounded-md bg-slate-100 text-[10px] font-semibold text-slate-400 ring-1 ring-slate-200">
+                      N/A
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   <p className="font-semibold text-[#052a42]">
@@ -254,7 +278,7 @@ export function ProjectsTable({
             ))}
             {!loading && items.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-slate-400">
+                <td colSpan={9} className="px-4 py-12 text-center text-slate-400">
                   No projects found.
                 </td>
               </tr>

@@ -37,11 +37,54 @@ type SeedClient = {
     upsert(args: unknown): Promise<unknown>;
   };
   project: {
-    upsert(args: unknown): Promise<unknown>;
+    upsert(args: unknown): Promise<{ id: string; slug: string }>;
+  };
+  projectImage: {
+    deleteMany(args: unknown): Promise<unknown>;
+    createMany(args: unknown): Promise<unknown>;
   };
   auditLog: {
     create(args: unknown): Promise<unknown>;
   };
+};
+
+const PROJECT_IMAGE_PATHS: Record<string, string[]> = {
+  "al-fursan-residential-compound-riyadh": [
+    "/portfolio/al-fursan/cover.jpg",
+    "/portfolio/al-fursan/gallery-1.jpg",
+    "/portfolio/al-fursan/gallery-2.jpg",
+    "/portfolio/al-fursan/gallery-3.jpg",
+  ],
+  "al-malqa-mixed-use-development-riyadh": [
+    "/portfolio/al-malqa/cover.jpg",
+    "/portfolio/al-malqa/gallery-1.jpg",
+    "/portfolio/al-malqa/gallery-2.jpg",
+  ],
+  "prince-fawaz-community-facilities-jeddah": [
+    "/portfolio/prince-fawaz/cover.jpg",
+    "/portfolio/prince-fawaz/gallery-1.jpg",
+    "/portfolio/prince-fawaz/gallery-2.jpg",
+  ],
+  "al-janaderiyah-urban-housing-riyadh": [
+    "/portfolio/al-janaderiyah/cover.jpg",
+    "/portfolio/al-janaderiyah/gallery-1.jpg",
+    "/portfolio/al-janaderiyah/gallery-2.jpg",
+  ],
+  "al-yasmin-premium-villas-riyadh": [
+    "/portfolio/al-yasmin/cover.jpg",
+    "/portfolio/al-yasmin/gallery-1.jpg",
+    "/portfolio/al-yasmin/gallery-2.jpg",
+  ],
+  "al-shatea-commercial-offices-jeddah": [
+    "/portfolio/al-shatea/cover.jpg",
+    "/portfolio/al-shatea/gallery-1.jpg",
+    "/portfolio/al-shatea/gallery-2.jpg",
+  ],
+  "al-arid-residential-expansion-riyadh": [
+    "/portfolio/al-arid/cover.jpg",
+    "/portfolio/al-arid/gallery-1.jpg",
+    "/portfolio/al-arid/gallery-2.jpg",
+  ],
 };
 
 export const ADMIN_EMAIL = "admin@bpholding.net";
@@ -231,7 +274,7 @@ export async function seedBpHoldingContent(client: SeedClient): Promise<void> {
   });
 
   for (const project of PREVIOUS_PROJECTS) {
-    await client.project.upsert({
+    const seededProject = await client.project.upsert({
       where: { slug: project.slug },
       update: {
         titleEn: project.titleEn,
@@ -265,6 +308,24 @@ export async function seedBpHoldingContent(client: SeedClient): Promise<void> {
         ownerId: adminUser.id,
       },
     });
+
+    const imagePaths = PROJECT_IMAGE_PATHS[project.slug] ?? [];
+
+    await client.projectImage.deleteMany({
+      where: {
+        projectId: seededProject.id,
+      },
+    });
+
+    if (imagePaths.length > 0) {
+      await client.projectImage.createMany({
+        data: imagePaths.map((imageUrl, index) => ({
+          projectId: seededProject.id,
+          imageUrl,
+          sortOrder: index,
+        })),
+      });
+    }
   }
 
   await client.auditLog.create({

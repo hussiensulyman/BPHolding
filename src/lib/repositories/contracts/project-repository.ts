@@ -21,6 +21,7 @@ export type ProjectRecord = {
   category: ProjectCategoryValue;
   status: PublishStatusValue;
   featured: boolean;
+  coverImageUrl?: string | null;
   completedAt: Date | null;
   sortOrder: number;
   ownerId: string | null;

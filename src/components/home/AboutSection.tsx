@@ -1,4 +1,5 @@
 import { CheckCircle } from "lucide-react";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
@@ -22,12 +23,16 @@ export async function AboutSection({ locale }: AboutSectionProps) {
           <div className="relative order-2 lg:order-1">
             {/* Primary image placeholder */}
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-              <div className="about-img-gradient absolute inset-0 flex items-center justify-center">
+              <div className="about-img-gradient absolute inset-0">
+                <Image
+                  src="/assets/home/about-city.jpg"
+                  alt="Modern skyline representing ongoing BP Holding developments"
+                  fill
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 48vw, 100vw"
+                />
                 {/* Placeholder pattern */}
                 <div className="about-img-pattern absolute inset-0 opacity-20" />
-                <span className="relative z-10 text-6xl font-extrabold text-[#df9a13] opacity-30">
-                  BP
-                </span>
               </div>
             </div>
             {/* Gold accent corner decoration */}

@@ -22,8 +22,19 @@ type ProjectDelegate = {
   delete(args: unknown): Promise<ProjectRecord>;
 };
 
+type ProjectImageDelegate = {
+  findMany(args: unknown): Promise<
+    Array<{
+      projectId: string;
+      imageUrl: string;
+      sortOrder: number;
+    }>
+  >;
+};
+
 type ProjectPrismaClient = Pick<PrismaClient, never> & {
   project: ProjectDelegate;
+  projectImage?: ProjectImageDelegate;
 };
 
 export class PrismaProjectRepository implements IProjectRepository {
@@ -148,8 +159,30 @@ export class PrismaProjectRepository implements IProjectRepository {
       this.prismaClient.project.count({ where }),
     ]);
 
+    const projectIds = items.map((item) => item.id);
+    const coverImageMap = new Map<string, string>();
+
+    if (projectIds.length > 0 && this.prismaClient.projectImage) {
+      const imageRows = await this.prismaClient.projectImage.findMany({
+        where: { projectId: { in: projectIds } },
+        orderBy: [{ sortOrder: "asc" }],
+        select: { projectId: true, imageUrl: true, sortOrder: true },
+      });
+
+      for (const row of imageRows) {
+        if (!coverImageMap.has(row.projectId)) {
+          coverImageMap.set(row.projectId, row.imageUrl);
+        }
+      }
+    }
+
+    const itemsWithCover = items.map((item) => ({
+      ...item,
+      coverImageUrl: coverImageMap.get(item.id) ?? null,
+    }));
+
     return {
-      items,
+      items: itemsWithCover,
       total,
     };
   }
