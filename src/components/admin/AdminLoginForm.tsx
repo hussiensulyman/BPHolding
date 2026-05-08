@@ -43,6 +43,7 @@ const COPY = {
     submit: "Sign in",
     submitting: "Signing in...",
     invalid: "Invalid credentials. Please check your email and password.",
+    unavailable: "Sign in service is temporarily unavailable. Please try again.",
     hint: "Demo seeded account: admin@bpholding.net / Admin@12345",
   },
   ar: {
@@ -53,9 +54,12 @@ const COPY = {
     submit: "تسجيل الدخول",
     submitting: "جارٍ تسجيل الدخول...",
     invalid: "بيانات الدخول غير صحيحة. يرجى مراجعة البريد وكلمة المرور.",
+    unavailable: "خدمة تسجيل الدخول غير متاحة مؤقتاً. يرجى المحاولة مرة أخرى.",
     hint: "حساب تجريبي: admin@bpholding.net / Admin@12345",
   },
 } as const;
+
+const SIGN_IN_TIMEOUT_MS = 15000;
 
 export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
   const [email, setEmail] = useState("admin@bpholding.net");
@@ -70,22 +74,40 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
     setIsSubmitting(true);
     setError(null);
 
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-      callbackUrl,
-    });
+    let timeoutId: number | undefined;
 
-    setIsSubmitting(false);
+    try {
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = window.setTimeout(() => {
+          reject(new Error("SIGN_IN_TIMEOUT"));
+        }, SIGN_IN_TIMEOUT_MS);
+      });
 
-    if (!result || result.error) {
-      setError(text.invalid);
-      return;
+      const result = await Promise.race([
+        signIn("credentials", {
+          redirect: false,
+          email,
+          password,
+          callbackUrl,
+        }),
+        timeoutPromise,
+      ]);
+
+      if (!result || result.error) {
+        setError(text.invalid);
+        return;
+      }
+
+      const safeRedirect = normalizeRedirectUrl(result.url, callbackUrl);
+      window.location.replace(safeRedirect);
+    } catch {
+      setError(text.unavailable);
+    } finally {
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+      setIsSubmitting(false);
     }
-
-    const safeRedirect = normalizeRedirectUrl(result.url, callbackUrl);
-    window.location.replace(safeRedirect);
   }
   return (
     <form
