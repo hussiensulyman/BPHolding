@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { getCsrfToken, signIn } from "next-auth/react";
 import { useState } from "react";
 
 type AdminLoginFormProps = {
@@ -67,18 +67,28 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
 
   const text = COPY[locale];
 
+  async function attemptSignIn() {
+    return signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+      callbackUrl,
+    });
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-        callbackUrl,
-      });
+      let result = await attemptSignIn();
+
+      // Recover from transient first-request failures by refreshing CSRF and retrying once.
+      if (!result) {
+        await getCsrfToken();
+        result = await attemptSignIn();
+      }
 
       if (!result || result.error) {
         setError(text.invalid);
@@ -88,7 +98,21 @@ export function AdminLoginForm({ locale, callbackUrl }: AdminLoginFormProps) {
       const safeRedirect = normalizeRedirectUrl(result.url, callbackUrl);
       window.location.replace(safeRedirect);
     } catch {
-      setError(text.unavailable);
+      try {
+        await getCsrfToken();
+        const retryResult = await attemptSignIn();
+
+        if (!retryResult || retryResult.error) {
+          setError(text.invalid);
+          return;
+        }
+
+        const safeRedirect = normalizeRedirectUrl(retryResult.url, callbackUrl);
+        window.location.replace(safeRedirect);
+        return;
+      } catch {
+        setError(text.unavailable);
+      }
     } finally {
       setIsSubmitting(false);
     }
