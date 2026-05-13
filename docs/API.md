@@ -20,10 +20,6 @@
 - `POST /api/rfq` for request submission with validated payload and MIME checks.
 - `POST /api/rfq/submit` for structured multi-step RFQ submissions.
 
-1. Careers
-
-- `POST /api/careers/applications` for job applications with CV upload checks.
-
 1. Admin Projects
 
 - `GET /api/admin/projects`
@@ -52,6 +48,10 @@
 
 - `GET /api/admin/audit`
 - `GET /api/admin/notifications`
+
+1. Admin Dashboard Stats
+
+- `GET /api/admin/dashboard/stats`
 
 ## Common Response Envelope
 
@@ -247,3 +247,8 @@ Error responses:
   - `application/x-acad`
   - `application/dwg`
 - Server-side verification: ImageKit file details are validated before persistence.
+
+## Current Route Notes
+
+- The public site currently ships homepage, portfolio, RFQ, and localized admin routes under `src/app/[locale]`.
+- Careers endpoints remain a roadmap item until a matching route is implemented.

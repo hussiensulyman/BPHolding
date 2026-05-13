@@ -2,6 +2,13 @@
 
 This documentation set defines the engineering baseline for BP Holding's bilingual digital platform.
 
+## Current Product Surface
+
+- Arabic-first marketing site with localized sections for company story, services, portfolio preview, certifications, and contact.
+- Portfolio studio with filtering, pagination, and localized project detail pages.
+- RFQ lead capture flow with file validation and success tracking.
+- Admin area with login, dashboard stats, submissions inbox, project CRUD, content editing, certifications management, and audit logs.
+
 ## Company Snapshot
 
 - Business Pioneers (BP) is the foundation of BP Holding, established in 2021.
@@ -42,7 +49,7 @@ This documentation set defines the engineering baseline for BP Holding's bilingu
 ## Document Map
 
 - `ARCHITECTURE.md`: system design, SOLID boundaries, modules.
-- `API.md`: API conventions, route contracts, auth requirements.
+- `API.md`: API conventions, route contracts, auth requirements, and the current route surface.
 - `DEPLOYMENT.md`: Vercel + managed PostgreSQL deployment flow.
 - `i18n-GUIDE.md`: Arabic-first localization and RTL/LTR implementation.
 - `COMMIT-CONVENTION.md`: enforced commit format and scopes.
